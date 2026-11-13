@@ -1,0 +1,735 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Requisitos Plataforma de Eventos SENA Fonseca</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: documento de una columna (~70ch) con franja de fases, tablas filtrables y zonas de participación (respuestas, preguntas del equipo, comentarios) */
+:root{
+  --bg:#f6f8f4; --surface:#ffffff; --sunk:#eef2eb; --fg:#1b2a1f; --muted:#5b6b5f; --line:#dbe3d8;
+  --accent:#2f8a00; --accent-ink:#ffffff; --accent-soft:#e6f2dc;
+  --pri-a:#b3261e; --pri-a-soft:#fbe7e5; --pri-m:#9a6200; --pri-m-soft:#fbf0db; --pri-b:#3d5a80; --pri-b-soft:#e5ecf5;
+  --font-display:"Archivo","Segoe UI",system-ui,sans-serif;
+  --font-body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+  --font-mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --s1:.25rem; --s2:.5rem; --s3:.75rem; --s4:1rem; --s5:1.5rem; --s6:2.25rem; --s7:3.5rem;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111813; --surface:#18221b; --sunk:#141d16; --fg:#e4ece3; --muted:#9db0a1; --line:#2b3a2f;
+  --accent:#7fd34a; --accent-ink:#0f1a10; --accent-soft:#1f3320;
+  --pri-a:#ff9b91; --pri-a-soft:#3a1f1c; --pri-m:#f2c46b; --pri-m-soft:#352a14; --pri-b:#a9c3e6; --pri-b-soft:#1e2a3a;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111813; --surface:#18221b; --sunk:#141d16; --fg:#e4ece3; --muted:#9db0a1; --line:#2b3a2f;
+  --accent:#7fd34a; --accent-ink:#0f1a10; --accent-soft:#1f3320;
+  --pri-a:#ff9b91; --pri-a-soft:#3a1f1c; --pri-m:#f2c46b; --pri-m-soft:#352a14; --pri-b:#a9c3e6; --pri-b-soft:#1e2a3a;
+  color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:1.0625rem;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:var(--s6) var(--s7)}
+.wrap{max-width:60rem;margin:0 auto;display:flex;flex-direction:column;gap:var(--s7)}
+h1,h2,h3{font-family:var(--font-display);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:clamp(1.9rem,4.5vw,2.75rem);font-weight:800;letter-spacing:-.01em}
+h2{font-size:1.6rem;font-weight:800}
+h3{font-size:1.1rem;font-weight:700}
+p{margin:0;max-width:68ch}
+a{color:var(--accent)}
+a:focus-visible,button:focus-visible,summary:focus-visible,textarea:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.eyebrow{font-family:var(--font-display);font-size:.78rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.muted{color:var(--muted)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+section{display:flex;flex-direction:column;gap:var(--s4)}
+.stack{display:flex;flex-direction:column;gap:var(--s3)}
+
+/* Cabecera */
+header{display:flex;flex-direction:column;gap:var(--s4);border-bottom:3px solid var(--accent);padding-bottom:var(--s5)}
+.meta{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s5);font-size:.95rem;color:var(--muted)}
+.meta b{color:var(--fg);font-weight:600}
+nav{display:flex;flex-wrap:wrap;gap:var(--s2)}
+nav a{font-size:.9rem;text-decoration:none;color:var(--fg);border:1px solid var(--line);background:var(--surface);padding:.25rem .7rem;border-radius:999px}
+nav a:hover{border-color:var(--accent);color:var(--accent)}
+nav a.hl{border-color:var(--accent);background:var(--accent-soft)}
+.note{font-size:.95rem;background:var(--pri-m-soft);border-left:3px solid var(--pri-m);padding:var(--s3) var(--s4);border-radius:0 6px 6px 0;max-width:none}
+.status{font-size:.95rem;background:var(--sunk);border:1px solid var(--line);padding:var(--s3) var(--s4);border-radius:6px;max-width:none}
+
+/* Problema */
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,22rem),1fr));gap:var(--s5)}
+.two > div{min-width:0}
+ul.clean{margin:0;padding-left:1.1rem;display:flex;flex-direction:column;gap:var(--s2)}
+.quote{font-family:var(--font-display);font-size:1.35rem;font-weight:700;line-height:1.3;border-left:4px solid var(--accent);padding-left:var(--s4);max-width:40ch}
+.quote small{display:block;font-family:var(--font-body);font-size:.9rem;font-weight:400;color:var(--muted);margin-top:var(--s2)}
+
+/* Fases */
+.phases{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--s3)}
+@media (max-width:760px){.phases{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:440px){.phases{grid-template-columns:1fr}}
+.phase{background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--accent);border-radius:6px;padding:var(--s4);display:flex;flex-direction:column;gap:var(--s3);min-width:0}
+.phase .n{font-family:var(--font-mono);font-size:.8rem;color:var(--accent)}
+.phase ul{margin:0;padding-left:1rem;font-size:.95rem;display:flex;flex-direction:column;gap:.2rem}
+.phase .docs{font-size:.85rem;color:var(--muted);border-top:1px dashed var(--line);padding-top:var(--s2);margin-top:auto}
+.control{background:var(--accent-soft);border-radius:6px;padding:var(--s2) var(--s4);font-size:.95rem;text-align:center}
+
+/* Filtros */
+.filters{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s2)}
+.filters span{font-size:.9rem;color:var(--muted);margin-right:var(--s2)}
+.filters button{font:inherit;font-size:.9rem;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--fg);padding:.3rem .8rem;border-radius:999px}
+.filters button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+
+/* Tablas */
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+table{width:100%;border-collapse:collapse;font-size:.97rem}
+th,td{text-align:left;vertical-align:top;padding:var(--s3) var(--s4);border-bottom:1px solid var(--line)}
+tr:last-child td{border-bottom:0}
+th{font-family:var(--font-display);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+td.id{font-family:var(--font-mono);font-size:.85rem;white-space:nowrap;color:var(--muted)}
+td.pri{white-space:nowrap}
+.group{display:flex;flex-direction:column;gap:var(--s3)}
+.chip{display:inline-block;font-size:.78rem;font-weight:700;padding:.1rem .55rem;border-radius:4px;white-space:nowrap}
+.chip.A{background:var(--pri-a-soft);color:var(--pri-a)}
+.chip.M{background:var(--pri-m-soft);color:var(--pri-m)}
+.chip.B{background:var(--pri-b-soft);color:var(--pri-b)}
+.chip.q{background:var(--pri-a-soft);color:var(--pri-a)}
+.chip.team{background:var(--accent-soft);color:var(--accent)}
+.chip.sec{background:var(--sunk);color:var(--muted);border:1px solid var(--line)}
+.doubt{font-size:.8rem;color:var(--pri-m);font-weight:600;white-space:nowrap}
+.legend{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s4);font-size:.9rem;color:var(--muted)}
+
+/* Preguntas */
+.qgroups{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,26rem),1fr));gap:var(--s5)}
+.qgroup{display:flex;flex-direction:column;gap:var(--s2);min-width:0}
+ol.qs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:var(--s2)}
+ol.qs > li{display:grid;grid-template-columns:2.2rem minmax(0,1fr);gap:var(--s2);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:var(--s3)}
+ol.qs > li.block{border-left:4px solid var(--pri-a)}
+ol.qs .num{font-family:var(--font-mono);font-size:.85rem;color:var(--muted);padding-top:.15rem;font-variant-numeric:tabular-nums}
+ol.qs .txt{min-width:0;display:flex;flex-direction:column;gap:.35rem}
+.tags{display:flex;flex-wrap:wrap;gap:var(--s2);align-items:center}
+
+/* Respuestas */
+details.ans{border-top:1px dashed var(--line);padding-top:var(--s2);margin-top:.15rem}
+details.ans > summary{cursor:pointer;font-size:.9rem;font-weight:600;color:var(--accent);list-style:none;display:inline-flex;align-items:center;gap:.4rem}
+details.ans > summary::-webkit-details-marker{display:none}
+details.ans > summary::before{content:"+";font-family:var(--font-mono);width:1.1rem;height:1.1rem;display:inline-grid;place-items:center;border:1px solid currentColor;border-radius:3px;font-size:.8rem;line-height:1}
+details.ans[open] > summary::before{content:"–"}
+.count{font-family:var(--font-mono);font-size:.78rem;background:var(--accent-soft);color:var(--accent);padding:0 .4rem;border-radius:3px}
+.count.zero{background:var(--sunk);color:var(--muted)}
+.ans-body{display:flex;flex-direction:column;gap:var(--s3);padding-top:var(--s3)}
+
+/* Entradas (respuestas y comentarios) */
+ul.entries{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:var(--s2)}
+.entry{background:var(--sunk);border-radius:6px;padding:var(--s2) var(--s3);display:flex;flex-direction:column;gap:.2rem;min-width:0}
+.entry .who{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem;font-size:.82rem;color:var(--muted)}
+.entry .who img{width:18px;height:18px;border-radius:50%}
+.entry .who b{color:var(--fg);font-weight:600}
+.entry .body{white-space:pre-wrap;overflow-wrap:anywhere;font-size:.97rem;max-width:none}
+.entry .del{margin-left:auto}
+.empty{font-size:.92rem;color:var(--muted);font-style:italic}
+
+/* Formularios */
+form.box{display:flex;flex-direction:column;gap:var(--s3);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:var(--s4)}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,14rem),1fr));gap:var(--s3)}
+.field{display:flex;flex-direction:column;gap:.3rem;min-width:0}
+.field label{font-size:.88rem;font-weight:600}
+textarea,select,input[type="text"]{font:inherit;font-size:.97rem;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:.5rem .65rem;width:100%}
+textarea{resize:vertical;min-height:4.5rem}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s3)}
+.btn{font:inherit;font-size:.92rem;font-weight:600;cursor:pointer;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);padding:.4rem 1rem;border-radius:6px}
+.btn:disabled{opacity:.55;cursor:default}
+.btn.ghost{background:transparent;color:var(--accent)}
+.link{font:inherit;font-size:.82rem;cursor:pointer;background:none;border:0;padding:0;color:var(--muted);text-decoration:underline}
+.link.danger{color:var(--pri-a)}
+.msg{font-size:.88rem;color:var(--muted)}
+.msg.err{color:var(--pri-a)}
+body:not([data-mode="ok"]) .writeui{display:none}
+
+/* Pasos y fuentes */
+ol.steps{margin:0;padding-left:1.3rem;display:flex;flex-direction:column;gap:var(--s2)}
+.sources{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,17rem),1fr));gap:var(--s3)}
+.src{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:var(--s4);display:flex;flex-direction:column;gap:var(--s2);font-size:.95rem;min-width:0}
+.src.main{border-color:var(--accent)}
+footer{font-size:.9rem;color:var(--muted);border-top:1px solid var(--line);padding-top:var(--s4)}
+@media (prefers-reduced-motion:no-preference){nav a,.filters button,.btn{transition:border-color .15s,background .15s,color .15s}}
+</style>
+<style>body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Levantamiento de requisitos · borrador v0.2</span>
+    <h1>Plataforma web para la gestión integral de eventos institucionales del SENA Fonseca</h1>
+    <div class="meta">
+      <span><b>Centro:</b> Agroempresarial y Acuícola, Fonseca (La Guajira)</span>
+      <span><b>Programa:</b> Análisis y Desarrollo de Software</span>
+      <span><b>Fecha:</b> 13 de noviembre de 2026</span>
+    </div>
+    <nav aria-label="Secciones">
+      <a href="#problema">Problema</a><a href="#fases">Fases del evento</a><a href="#funcionales">Requisitos funcionales</a><a href="#roles">Roles</a><a href="#no-funcionales">No funcionales</a><a href="#preguntas" class="hl">Preguntas para responder</a><a href="#equipo" class="hl">Agregar preguntas</a><a href="#comentarios" class="hl">Comentarios</a><a href="#pasos">Siguientes pasos</a><a href="#fuentes">Fuentes</a>
+    </nav>
+    <p class="note">La explicación de la instructora se transcribió automáticamente y algunos tramos se entienden mal por el ruido del salón. Lo marcado con <b>por confirmar</b> se dedujo de frases dudosas y hay que validarlo con ella.</p>
+    <p class="status" id="status">Cargando las respuestas y comentarios del equipo…</p>
+    <div class="status" id="local-box" hidden>
+      <div class="stack">
+        <p id="local-text"><b>Esta copia guarda lo que escribas solo en este navegador y en este equipo.</b> Para compartirlo, usa <b>Exportar respuestas</b> y envía el archivo que se descarga.</p>
+        <div class="fields">
+          <div class="field"><label for="local-name">Tu nombre (aparece en lo que escribas)</label><input type="text" id="local-name" maxlength="60" placeholder="Ej.: Sharoll Bolaño"></div>
+        </div>
+        <div class="row"><button type="button" class="btn" id="local-export">Exportar respuestas</button><span class="msg" id="local-msg" role="status"></span></div>
+      </div>
+    </div>
+  </header>
+
+  <section id="problema">
+    <span class="eyebrow">Contexto</span>
+    <h2>El problema que hay que resolver</h2>
+    <div class="two">
+      <div class="stack">
+        <ul class="clean">
+          <li>En el centro <b>no hay un área ni una directriz</b> para organizar eventos: se le pide a cualquier instructor "organiza tal evento".</li>
+          <li>Hoy todo se coordina por <b>conversaciones y grupos de WhatsApp</b>: se pierde información, se duplican tareas y cuesta asignar responsables.</li>
+          <li><b>El conocimiento se queda en la cabeza de las personas.</b> Cada año, al buscar lo que se hizo el anterior, no hay de dónde sacarlo.</li>
+          <li><b>Día del Campesino:</b> 700 a 1000 personas. Solo el último año quedó una base de datos de campesinos para volver a invitarlos.</li>
+          <li><b>Feria GEN-INNOVA:</b> 75 proyectos inscritos y 22 evaluadores. Este año se amplió a colegios y universidades.</li>
+        </ul>
+      </div>
+      <div class="stack">
+        <p class="quote">"Los sistemas son estructuras que funcionan conmigo o sin mí."<small>La instructora, sobre lo que espera de la plataforma: trazabilidad de cada evento y un modelo reutilizable.</small></p>
+        <ul class="clean">
+          <li>Los aprendices de ADSO deciden la herramienta (aplicación web, móvil, página o programa). El póster propone una <b>plataforma web</b>.</li>
+          <li>Trabajo <b>por equipos y por fases</b>, con unas <b>3 o 4 semanas</b> disponibles.</li>
+          <li>Referentes: gestión de eventos, sistemas de información, <b>ISO 9001:2015</b> y aprendizaje basado en proyectos. Las tareas se organizan en Trello.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="fases">
+    <span class="eyebrow">Columna vertebral del sistema</span>
+    <h2>Fases del proceso administrativo del evento</h2>
+    <p class="muted">Cada fase tiene un requisito documental: un documento que se genera y que permite pasar a la siguiente.</p>
+    <div class="phases" id="phases"></div>
+    <div class="control">Seguimiento y control en todas las fases</div>
+  </section>
+
+  <section id="funcionales">
+    <span class="eyebrow">35 requisitos</span>
+    <h2>Requisitos funcionales</h2>
+    <div class="legend">
+      <span><span class="chip A">Imprescindible</span> lo pidió la instructora</span>
+      <span><span class="chip M">Importante</span></span>
+      <span><span class="chip B">Deseable</span> o deducido</span>
+    </div>
+    <div class="filters" role="group" aria-label="Filtrar por prioridad">
+      <span>Mostrar:</span>
+      <button type="button" id="f-all" data-f="all" aria-pressed="true">Todos</button>
+      <button type="button" id="f-A" data-f="A" aria-pressed="false">Imprescindibles</button>
+      <button type="button" id="f-M" data-f="M" aria-pressed="false">Importantes</button>
+      <button type="button" id="f-B" data-f="B" aria-pressed="false">Deseables</button>
+    </div>
+    <div id="rf" class="stack" style="gap:var(--s5)"></div>
+    <p class="muted">¿Falta algo o hay que corregir un requisito? Déjalo en <a href="#comentarios">Comentarios</a> indicando su ID.</p>
+  </section>
+
+  <section id="roles">
+    <span class="eyebrow">Deducido</span>
+    <h2>Usuarios y roles</h2>
+    <div class="tbl"><table>
+      <thead><tr><th>Rol</th><th>Qué hace</th></tr></thead>
+      <tbody id="roles-body"></tbody>
+    </table></div>
+  </section>
+
+  <section id="no-funcionales">
+    <span class="eyebrow">Calidad</span>
+    <h2>Requisitos no funcionales</h2>
+    <div class="tbl"><table>
+      <thead><tr><th>ID</th><th>Requisito</th></tr></thead>
+      <tbody id="rnf-body"></tbody>
+    </table></div>
+  </section>
+
+  <section id="preguntas">
+    <span class="eyebrow">39 preguntas</span>
+    <h2>Preguntas para responder</h2>
+    <p class="muted">Respuestas de la instructora y del equipo para afinar los requisitos y saber exactamente qué se va a construir. Abre <b>Respuestas</b> debajo de cada pregunta para leer lo que ya se respondió o escribir la tuya. Las marcadas como <span class="chip q">Bloqueante</span> hay que responderlas antes de empezar el diseño.</p>
+    <div class="filters" role="group" aria-label="Filtrar preguntas">
+      <span>Mostrar:</span>
+      <button type="button" id="q-all" data-q="all" aria-pressed="true">Todas</button>
+      <button type="button" id="q-block" data-q="block" aria-pressed="false">Solo bloqueantes</button>
+      <button type="button" id="q-open" data-q="open" aria-pressed="false">Sin responder</button>
+    </div>
+    <div class="qgroups" id="qs"></div>
+  </section>
+
+  <section id="equipo">
+    <span class="eyebrow">Preguntas del equipo</span>
+    <h2>Agregar preguntas</h2>
+    <p class="muted">¿Se te ocurre algo que falta preguntar? Agrégalo aquí y cualquiera del equipo o la instructora podrá responderlo.</p>
+    <form class="box writeui" id="tq-form">
+      <div class="field">
+        <label for="tq-txt">Tu pregunta</label>
+        <textarea id="tq-txt" rows="3" maxlength="1000" required placeholder="Ej.: ¿Los certificados deben llevar código QR para verificarlos?"></textarea>
+      </div>
+      <div class="fields">
+        <div class="field">
+          <label for="tq-tema">Tema</label>
+          <select id="tq-tema"></select>
+        </div>
+        <div class="field">
+          <label for="tq-block">¿Bloquea el diseño?</label>
+          <select id="tq-block"><option value="0">No</option><option value="1">Sí, hay que responderla antes de empezar</option></select>
+        </div>
+      </div>
+      <div class="row"><button type="submit" class="btn" id="tq-send">Agregar pregunta</button><span class="msg" id="tq-msg" role="status"></span></div>
+    </form>
+    <ol class="qs" id="tq-list"></ol>
+    <p class="empty" id="tq-empty">Todavía nadie ha agregado preguntas.</p>
+  </section>
+
+  <section id="comentarios">
+    <span class="eyebrow">Mejoras</span>
+    <h2>Comentarios para mejorar</h2>
+    <p class="muted">Correcciones, ideas o cosas que faltan. Indica la sección y, si aplica, el ID del requisito o el número de la pregunta.</p>
+    <form class="box writeui" id="c-form">
+      <div class="fields">
+        <div class="field">
+          <label for="c-sec">Sección</label>
+          <select id="c-sec"></select>
+        </div>
+        <div class="field">
+          <label for="c-ref">Sobre (opcional)</label>
+          <input type="text" id="c-ref" maxlength="40" placeholder="Ej.: RF-18 o pregunta 16">
+        </div>
+      </div>
+      <div class="field">
+        <label for="c-txt">Comentario</label>
+        <textarea id="c-txt" rows="4" maxlength="2000" required placeholder="Ej.: En RF-28 falta que el certificado incluya la firma del subdirector."></textarea>
+      </div>
+      <div class="row"><button type="submit" class="btn" id="c-send">Publicar comentario</button><span class="msg" id="c-msg" role="status"></span></div>
+    </form>
+    <div class="filters" role="group" aria-label="Filtrar comentarios por sección" id="c-filters"></div>
+    <ul class="entries" id="c-list"></ul>
+    <p class="empty" id="c-empty">Todavía no hay comentarios.</p>
+  </section>
+
+  <section id="pasos">
+    <span class="eyebrow">Plan</span>
+    <h2>Siguientes pasos</h2>
+    <ol class="steps">
+      <li>Responder las preguntas bloqueantes con la instructora y recoger los formatos que ya usa (pregunta 10).</li>
+      <li>Definir el alcance del producto mínimo y repartir los equipos por fase.</li>
+      <li>Escribir las historias de usuario por fase en Trello a partir de los requisitos RF-01 a RF-35.</li>
+      <li>Diseñar el modelo de datos: evento, tipología, comité, tarea, requerimiento, proveedor, contacto, asistencia, encuesta, certificado y evidencia.</li>
+      <li>Hacer los mockups y validarlos con la instructora antes de programar.</li>
+    </ol>
+  </section>
+
+  <section id="fuentes">
+    <span class="eyebrow">De dónde sale esto</span>
+    <h2>Fuentes</h2>
+    <div class="sources">
+      <div class="src main"><h3>Audio de la clase (43 min)</h3><p>Explicación de la instructora sobre el proyecto, minutos 0 a 35. Otros dos audios recibidos repiten el mismo contenido en dos partes.</p></div>
+      <div class="src"><h3>Póster GEN-INNOVA</h3><p>2ª Feria de Investigación. Autores: Dina Luz León Solano, Angélica Guevara, Helga Rincones, Yesica Arévalo. Ponentes: Sharoll Yulieth Bolaño Teherán, Keidis Sorelis Ariño Prieto.</p></div>
+      <div class="src"><h3>Pizarra de la clase</h3><p>Fases del proceso administrativo del evento: planificación, programación, ejecución y evaluación.</p></div>
+    </div>
+  </section>
+
+  <footer>Borrador para revisar con la instructora. La sección de objetivos del póster no se lee en la foto y queda pendiente.</footer>
+</div>
+
+<script>
+const PHASES=[
+ {n:"Fase 1",t:"Planificación",items:["Tipo de evento (tipología)","Objetivos y características","Público objetivo","Comités y funciones","Riesgos del evento"],docs:"Manual de funciones: plan de acción, cronograma y presupuesto inicial. Panorama de riesgos."},
+ {n:"Fase 2",t:"Programación",items:["Requerimientos técnicos, de personal y financieros","Banco de proveedores","Timing general"],docs:"Agenda, programa, libreto del presentador y minuto a minuto."},
+ {n:"Fase 3",t:"Ejecución",items:["Montaje y desmontaje","Desarrollo del evento","Registro de asistencia"],docs:"Lista de asistencia y evidencias de ejecución."},
+ {n:"Fase 4",t:"Evaluación",items:["Evaluación de los asistentes","Evaluación administrativa","Memorias y certificados"],docs:"Informe de evaluación, certificados o constancias e informe final de ejecución."}
+];
+const RF=[
+ {g:"Gestión de eventos y tipologías",r:[
+  ["RF-01","Crear, editar, consultar y archivar eventos con nombre, fecha, hora, lugar, motivo y estado (fase actual).","A"],
+  ["RF-02","Clasificar el evento por tipología. Los eventos sociales (cumpleaños, primera comunión) no aplican; el enfoque son los eventos corporativos o institucionales: lanzamiento de marca, conferencia, seminario, taller, workshop, road show, congreso, convención, charla, conversatorio, feria (más de 20 tipos). Catálogo administrable.","A"],
+  ["RF-03","Registrar el objetivo del evento (\"¿qué tengo que lograr?\"), sus características y el público objetivo.","A"],
+  ["RF-04","Historial de eventos: consultar cómo se hizo un evento en años anteriores y duplicarlo como plantilla para la siguiente edición.","A"],
+  ["RF-05","Ver el avance del evento por fase en un tablero de seguimiento y control.","M"]]},
+ {g:"Planificación",r:[
+  ["RF-06","Comités del evento con sus funciones. La instructora menciona seis: logística, comunicaciones, académico, decoración y otros dos que no se entienden en el audio.","A"],
+  ["RF-07","Plan de acción: cada función genera tareas, cada tarea cumple un objetivo y tiene un responsable.","A"],
+  ["RF-08","Cronograma de actividades generado desde el plan de acción, con fechas, responsables y estado. Ejemplo: comité académico → buscar conferencistas → contactarlos → enviar la invitación.","A"],
+  ["RF-09","Presupuesto inicial ajustable a medida que aparecen requerimientos (inicial frente a ejecutado).","A"],
+  ["RF-10","Panorama de riesgos: riesgo, nivel, medidas y plan alternativo, con lista de chequeo de seguridad y salud en el trabajo. Ejemplo real: la inundación por lluvia en el Día del Campesino.","A"],
+  ["RF-11","Conferencistas e invitados especiales: contacto, residencia, ocupación, hoja de vida y condiciones que piden (transporte, hospedaje, honorarios, alimentación).","A"],
+  ["RF-12","Adjuntar el rider técnico de artistas o conferencistas.","M"]]},
+ {g:"Programación",r:[
+  ["RF-13","Requerimientos clasificados en técnicos, de personal y financieros: mesa, mantel blanco con el logo del SENA, sillas, computadores o tabletas, micrófonos, parlantes, refrigerio, material impreso.","A"],
+  ["RF-14","Banco de proveedores reutilizable: servicio, qué incluye (p. ej., sonido con 2 micrófonos y 3 parlantes), costo, contacto e historial.","A"],
+  ["RF-15","Agenda: las grandes partes del evento (inicio y protocolo, desarrollo, cierre y evaluación).","A"],
+  ["RF-16","Programa con duración de cada punto: registro, acto protocolario, oración, bienvenida, himno nacional e himno del SENA, palabras del subdirector y coordinadores, charla, refrigerio, cierre.","A"],
+  ["RF-17","Libreto del presentador generado desde el programa y la definición del evento (por qué, para qué, objetivos). Hoy lo redactan con inteligencia artificial; debe poder editarse a mano.","M"],
+  ["RF-18","Minuto a minuto: cada acción con hora, duración, responsable y recursos. Ejemplo: instalar la mesa de registro debajo del palo de mango, 20 minutos, con mesa, mantel, 3 sillas y celulares con el QR. Incluye el día anterior, el día del evento y el después.","A"],
+  ["RF-19","Solicitudes internas de recursos (mesas, sillas, maquinaria, espacios) al administrador del centro con plantilla de correo reutilizable.","M"],
+  ["RF-20","Inventario de recursos del centro y su ubicación (p. ej., las 26 mesas naranjas repartidas por el centro).","B",1]]},
+ {g:"Ejecución",r:[
+  ["RF-21","Registro de asistencia con código QR desde celulares, tabletas o computadores.","A"],
+  ["RF-22","Evidencias de ejecución: fotos, listas, documentos y videos por evento o actividad.","A"],
+  ["RF-23","Lista de chequeo de montaje y desmontaje.","M"],
+  ["RF-24","Marcar actividades del minuto a minuto como hechas o con novedad durante el evento.","B"]]},
+ {g:"Evaluación y cierre",r:[
+  ["RF-25","Encuesta de satisfacción por QR generada automáticamente desde un banco de preguntas reutilizable (escala de 1 a 5 y comentarios), sin crear un formulario nuevo cada vez.","A"],
+  ["RF-26","Informe de evaluación automático con los resultados de la encuesta.","A"],
+  ["RF-27","Evaluación administrativa interna del equipo organizador: qué funcionó, qué no y lecciones para la próxima edición.","A"],
+  ["RF-28","Certificados o constancias: cargar un Excel con nombres, documentos, fecha y duración, aplicar una plantilla de diseño y generarlos automáticamente.","A"],
+  ["RF-29","Envío masivo por correo y descarga del certificado desde la plataforma, buscando por número de documento.","A"],
+  ["RF-30","Memorias del evento descargables (presentaciones, fotos, conclusiones).","M"],
+  ["RF-31","Informe final de ejecución: presupuesto, asistencia, evaluación, evidencias y novedades.","A"]]},
+ {g:"Banco de datos histórico",r:[
+  ["RF-32","Directorio de contactos reutilizable: asistentes, invitados (p. ej., campesinos), evaluadores, conferencistas, proveedores y aliados.","A"],
+  ["RF-33","Volver a invitar a los contactos de una edición anterior: de los 22 evaluadores, buscar solo a los que no puedan repetir.","A"],
+  ["RF-34","Ferias de proyectos: inscripción de proyectos y asignación de evaluadores según los inscritos (p. ej., 75 proyectos, de 7 a 10 por evaluador, en unas 2 horas).","M",1],
+  ["RF-35","Búsqueda y filtros del histórico por tipo de evento, año, lugar y responsable.","M"]]}
+];
+const ROLES=[
+ ["Administrador o coordinador general","Crea eventos, comités y catálogos, y ve todos los informes."],
+ ["Líder o miembro de comité","Gestiona las tareas de su comité y sube evidencias."],
+ ["Presentador o maestro de ceremonias","Consulta el programa y el libreto."],
+ ["Asistente o invitado","Se registra por QR, responde la encuesta y descarga su certificado. Puede no necesitar cuenta."],
+ ["Evaluador de ferias","Ve los proyectos que le tocan y los califica (por confirmar)."],
+ ["Directivo (subdirección o coordinación)","Consulta informes en modo solo lectura."]
+];
+const RNF=[
+ ["RNF-01","Plataforma web adaptable al celular: el registro por QR y las encuestas se usan desde el teléfono."],
+ ["RNF-02","Fácil de usar para personas sin perfil técnico (instructores y aprendices de cualquier programa)."],
+ ["RNF-03","Continuidad: la información no depende de una persona y tiene copias de seguridad."],
+ ["RNF-04","Protección de datos personales (Ley 1581 de 2012, Habeas Data), porque se guardan documentos de identidad, teléfonos y correos. Añadido en el análisis; la instructora no lo mencionó."],
+ ["RNF-05","Documentos descargables en PDF y Excel: programa, minuto a minuto, informes y certificados."],
+ ["RNF-06","Alineación con ISO 9001:2015 (control de documentos y registros, mejora continua) y con la imagen institucional del SENA."],
+ ["RNF-07","Control de acceso por roles."],
+ ["RNF-08","Documentación suficiente para que otros aprendices continúen el proyecto."]
+];
+// [número, texto, pista opcional, bloqueante]
+const QS=[
+ {g:"Visión y prioridades",q:[
+  [33,"¿Qué tarea le quita más tiempo hoy cuando organiza un evento?","Ayuda a decidir qué construir primero.",0],
+  [34,"¿Cuál es el próximo evento real del centro y en qué fecha? ¿Podría ser la primera prueba de la plataforma?","",0],
+  [35,"Ordene las 4 fases (planificación, programación, ejecución, evaluación) de la más urgente a la menos urgente.","",1],
+  [36,"¿Qué NO debe hacer la plataforma? Lo que queda fuera del alcance de este proyecto.","",0],
+  [37,"¿Cuántos eventos organiza el centro al año y de qué tamaño (número de asistentes)?","",0],
+  [38,"¿Conoce alguna herramienta que le sirva de referencia (Google Forms, Trello, Eventbrite u otra)? ¿Qué le gusta de ella?","",0],
+  [39,"Si el proyecto sale bien, ¿qué habrá cambiado dentro de un año?","",0]]},
+ {g:"Alcance y entrega",q:[
+  [1,"¿Qué debe estar funcionando al final de las 3 o 4 semanas? ¿Un prototipo navegable, un producto mínimo con alguna fase completa o solo el diseño (requisitos, casos de uso, mockups, base de datos)?","",1],
+  [2,"¿Por qué fase empezamos?","Propuesta: certificados, encuestas QR y registro de asistencia, que es lo que más trabajo ahorra hoy.",1],
+  [3,"¿Cómo se reparten los equipos? ¿Uno por fase? ¿Cuántos aprendices por equipo?","",1],
+  [4,"¿Qué entregables académicos se piden además del software (documento de investigación, póster, presentación, manual de usuario)? ¿Hay fecha de sustentación?","",0],
+  [5,"¿El sistema es solo para el SENA Fonseca o debe servir de modelo para otros centros?","",0]]},
+ {g:"Usuarios",q:[
+  [6,"¿Quién usará la plataforma día a día? ¿Solo la instructora y su equipo, cualquier instructor al que le asignen un evento, o también coordinación académica y comunicaciones?","",1],
+  [7,"¿Los asistentes necesitan crear una cuenta o basta con registrarse por QR con nombre y documento?","",0],
+  [8,"¿Los evaluadores de la feria califican los proyectos dentro de la plataforma o eso queda fuera del alcance?","",0],
+  [9,"¿Quién aprueba un evento o su presupuesto antes de ejecutarlo (subdirector, coordinación)?","",0]]},
+ {g:"Proceso y documentos",q:[
+  [10,"¿Nos puede compartir los formatos que ya usa? Manual de funciones, los 6 comités y sus funciones, plan de acción, cronograma, presupuesto, panorama de riesgos, minuto a minuto, libreto y encuesta.","",1],
+  [11,"¿Cuáles son exactamente los 6 comités?","En el audio se entienden logística, comunicaciones, académico y decoración.",0],
+  [12,"¿Cuál es la lista de tipologías de eventos que hay que precargar?","",0],
+  [13,"¿El panorama de riesgos sigue una metodología concreta (matriz de seguridad y salud en el trabajo, GTC 45) con niveles de probabilidad e impacto?","",0],
+  [14,"¿El presupuesto maneja dinero real del SENA (rubros, órdenes de compra) o es solo una estimación de costos?","",0],
+  [15,"¿Las solicitudes de recursos al administrador del centro se envían desde la plataforma o basta con generar el correo?","",0]]},
+ {g:"Asistencia, encuestas y certificados",q:[
+  [16,"¿Qué diferencia hay entre certificado y constancia? ¿Quién los firma? ¿Llevan firma digital, logo o código de verificación?","",1],
+  [17,"¿Qué datos exactos trae el Excel de asistentes? (Nombre, tipo y número de documento, correo, teléfono, ficha o programa.)","",0],
+  [18,"¿El certificado se entrega a todos los inscritos o solo a quienes registraron asistencia por QR?","",0],
+  [19,"¿Desde qué correo se harán los envíos masivos (institucional o del proyecto)? ¿Cuántos correos como máximo por evento?","El Día del Campesino puede llegar a 1000 asistentes.",0],
+  [20,"¿Las preguntas de la encuesta son las mismas para todos los eventos o cambian según la tipología?","",0],
+  [21,"¿Hay asistentes sin celular o sin internet (p. ej., campesinos)? ¿Hace falta registro manual que luego se digite?","",0]]},
+ {g:"Inteligencia artificial",q:[
+  [22,"¿Quieren que la plataforma genere el libreto del presentador con IA o basta con una plantilla que se rellene con los datos del evento?","La IA implica costo y conexión a un servicio externo.",0]]},
+ {g:"Técnica e infraestructura",q:[
+  [23,"¿Dónde se va a alojar la plataforma (servidor del SENA, hosting gratuito, dominio propio)? ¿Quién la mantiene cuando el grupo termine?","",1],
+  [24,"¿Qué tecnologías se han visto en la formación ADSO y cuáles deben usarse (lenguaje, framework, base de datos)?","",1],
+  [25,"¿Se integra con algún sistema del SENA (Sofía Plus, correo institucional, Google Workspace o Microsoft 365)?","",0],
+  [26,"¿Hay que migrar datos existentes (campesinos, los 22 evaluadores, eventos de 2024 y 2025)? ¿En qué formato están?","",0],
+  [27,"¿Debe funcionar sin conexión durante el evento en zonas del centro con mala señal?","",0]]},
+ {g:"Datos y seguridad",q:[
+  [28,"¿Hay una política de tratamiento de datos personales del SENA que haya que mostrar o aceptar en el registro?","",0],
+  [29,"¿Cuánto tiempo se guardan los datos, las evidencias y los certificados?","",0]]},
+ {g:"Validación",q:[
+  [30,"¿A quién aplicamos las encuestas y entrevistas para validar los requisitos? ¿Cuántas?","",0],
+  [31,"¿En qué evento real se puede probar el prototipo (p. ej., un próximo conversatorio)?","",0],
+  [32,"¿Qué criterios usará la instructora para dar el proyecto por aceptado?","",0]]}
+];
+const SECTIONS=["General","Problema","Fases del evento","Requisitos funcionales","Roles","No funcionales","Preguntas","Siguientes pasos"];
+const PRI={A:"Imprescindible",M:"Importante",B:"Deseable"};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const $=id=>document.getElementById(id);
+const el=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e};
+
+/* ---------- Contenido estático ---------- */
+$("phases").innerHTML=PHASES.map(p=>`<div class="phase"><span class="n">${p.n}</span><h3>${p.t}</h3><ul>${p.items.map(i=>`<li>${esc(i)}</li>`).join("")}</ul><div class="docs"><b>Documentos:</b> ${esc(p.docs)}</div></div>`).join("");
+$("rf").innerHTML=RF.map(g=>`<div class="group"><h3>${esc(g.g)}</h3><div class="tbl"><table><thead><tr><th>ID</th><th>Requisito</th><th>Prioridad</th></tr></thead><tbody>${g.r.map(r=>`<tr data-p="${r[2]}"><td class="id">${r[0]}</td><td>${esc(r[1])}${r[3]?` <span class="doubt">· por confirmar</span>`:""}</td><td class="pri"><span class="chip ${r[2]}">${PRI[r[2]]}</span></td></tr>`).join("")}</tbody></table></div></div>`).join("");
+$("roles-body").innerHTML=ROLES.map(r=>`<tr><td><b>${esc(r[0])}</b></td><td>${esc(r[1])}</td></tr>`).join("");
+$("rnf-body").innerHTML=RNF.map(r=>`<tr><td class="id">${r[0]}</td><td>${esc(r[1])}</td></tr>`).join("");
+$("tq-tema").innerHTML=QS.map(g=>`<option>${esc(g.g)}</option>`).join("")+"<option>Otro</option>";
+$("c-sec").innerHTML=SECTIONS.map(s=>`<option>${esc(s)}</option>`).join("");
+
+/* ---------- Bloque de respuestas reutilizable ---------- */
+const ANS_UI={}; // qid -> {details, count, list}
+function answerBlock(qid){
+  const d=el("details","ans"); d.dataset.qid=qid;
+  const s=el("summary"); s.append("Respuestas "); const c=el("span","count zero","0"); s.append(c); d.append(s);
+  const body=el("div","ans-body"); const list=el("ul","entries"); body.append(list);
+  const f=el("form","writeui stack"); f.innerHTML=`<label class="sr" for="a-${qid}">Tu respuesta</label><textarea id="a-${qid}" rows="3" maxlength="2000" required placeholder="Escribe tu respuesta…"></textarea><div class="row"><button type="submit" class="btn">Guardar respuesta</button><span class="msg" role="status"></span></div>`;
+  f.addEventListener("submit",ev=>{ev.preventDefault();const ta=f.querySelector("textarea");const txt=ta.value.trim();if(!txt)return;
+    write(f,()=>ST.db.collection("respuestas").add(withName({qid,texto:txt,autor:ST.me,creado:new Date().toISOString()})),()=>{ta.value=""},"Respuesta guardada.");});
+  body.append(f); d.append(body);
+  ANS_UI[qid]={details:d,count:c,list};
+  return d;
+}
+function questionLi(num,text,hint,block,qid,extraTags){
+  const li=el("li",block?"block":""); li.dataset.b=block?"1":"0"; li.dataset.qid=qid;
+  li.append(el("span","num",num));
+  const t=el("div","txt"); t.append(el("span","",text));
+  if(hint)t.append(el("span","muted",hint));
+  const tags=el("div","tags"); if(block)tags.append(el("span","chip q","Bloqueante")); (extraTags||[]).forEach(x=>tags.append(x));
+  if(tags.childNodes.length)t.append(tags);
+  t.append(answerBlock(qid)); li.append(t); return li;
+}
+const qsRoot=$("qs");
+QS.forEach(g=>{const box=el("div","qgroup");box.append(el("h3","",g.g));const ol=el("ol","qs");
+  g.q.forEach(q=>ol.append(questionLi(String(q[0]).padStart(2,"0"),q[1],q[2],q[3]===1,"q"+q[0])));box.append(ol);qsRoot.append(box)});
+
+/* ---------- Filtros ---------- */
+function press(sel,btn){document.querySelectorAll(sel).forEach(b=>b.setAttribute("aria-pressed",b===btn?"true":"false"))}
+document.querySelectorAll("[data-f]").forEach(b=>b.addEventListener("click",()=>{
+  const f=b.dataset.f;press("[data-f]",b);
+  document.querySelectorAll("#rf .group").forEach(g=>{let any=false;g.querySelectorAll("tbody tr").forEach(tr=>{const show=f==="all"||tr.dataset.p===f;tr.hidden=!show;if(show)any=true});g.hidden=!any});
+}));
+let qFilter="all";
+function applyQFilter(){
+  document.querySelectorAll("#qs .qgroup").forEach(g=>{let any=false;g.querySelectorAll("ol.qs > li").forEach(li=>{
+    const n=(ST.byQ[li.dataset.qid]||[]).length;
+    const show=qFilter==="all"||(qFilter==="block"&&li.dataset.b==="1")||(qFilter==="open"&&n===0);li.hidden=!show;if(show)any=true});g.hidden=!any});
+}
+document.querySelectorAll("[data-q]").forEach(b=>b.addEventListener("click",()=>{qFilter=b.dataset.q;press("[data-q]",b);applyQFilter()}));
+let cFilter="Todas";
+
+/* ---------- Estado compartido ---------- */
+const ST={db:null,user:null,me:null,canEdit:false,ans:[],cmt:[],tq:[],byQ:{},loaded:{ans:false,cmt:false,tq:false},err:false,mode:"loading"};
+function setMode(m,msg){ST.mode=m;document.body.dataset.mode=m;const s=$("status");if(msg){s.textContent=msg;s.hidden=false}else s.hidden=true}
+setMode("loading","Cargando las respuestas y comentarios del equipo…");
+
+const isLoaded=k=>ST.loaded[k]||ST.mode==="offline";
+function fmt(iso){if(!iso)return "";try{return new Date(iso).toLocaleString("es-CO",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}catch(e){return ""}}
+function canDelete(item){return ST.mode==="ok"&&(ST.canEdit||(item.autor&&item.autor===ST.me))}
+
+function entryLi(item,ps,onDelete,extra){
+  const li=el("li","entry"); const who=el("div","who");
+  const p=item.autor&&ps[item.autor];
+  if(p&&p.avatarUrl){const img=el("img");img.src=p.avatarUrl;img.alt="";who.append(img)}
+  who.append(el("b","",(p&&p.name)||item.nombre||"Alguien del equipo"));
+  if(item.creado)who.append(el("span","",fmt(item.creado)));
+  (extra||[]).forEach(x=>who.append(x));
+  if(canDelete(item)){
+    const box=el("span","del"); const b=el("button","link","Eliminar"); b.type="button";
+    b.addEventListener("click",()=>{box.textContent="";const q=el("span","","¿Eliminar? ");const y=el("button","link danger","Sí");y.type="button";const n=el("button","link","No");n.type="button";
+      y.addEventListener("click",async()=>{y.disabled=true;try{await onDelete()}catch(e){box.textContent="No se pudo eliminar."}});
+      n.addEventListener("click",()=>{box.textContent="";box.append(b)});box.append(q,y," ",n)});
+    box.append(b); who.append(box);
+  }
+  li.append(who); li.append(el("p","body",item.texto||"")); return li;
+}
+
+let renderToken=0;
+async function render(){
+  const token=++renderToken;
+  ST.byQ={}; ST.ans.forEach(a=>{(ST.byQ[a.qid]=ST.byQ[a.qid]||[]).push(a)});
+  const ids=[...new Set([...ST.ans,...ST.cmt,...ST.tq].map(x=>x.autor).filter(Boolean))];
+  let ps={}; if(ST.user&&ids.length){try{ps=await ST.user.profiles(ids)}catch(e){ps={}}}
+  if(token!==renderToken)return;
+
+  syncTeamQuestions(ps);
+
+  Object.entries(ANS_UI).forEach(([qid,ui])=>{
+    const arr=ST.byQ[qid]||[]; ui.count.textContent=arr.length; ui.count.className="count"+(arr.length?"":" zero");
+    ui.list.textContent="";
+    if(!arr.length){const e=el("li","empty",isLoaded("ans")?"Sin respuestas todavía.":"Cargando…");ui.list.append(e)}
+    arr.forEach(a=>ui.list.append(entryLi(a,ps,()=>ST.db.doc("respuestas/"+a.id).delete())));
+  });
+  applyQFilter();
+
+  // Comentarios
+  const secs=["Todas",...SECTIONS.filter(s=>ST.cmt.some(c=>c.seccion===s))];
+  if(!secs.includes(cFilter))cFilter="Todas";
+  const fb=$("c-filters"); fb.textContent=""; if(ST.cmt.length){fb.append(el("span","","Sección:"));secs.forEach(s=>{const b=el("button","",s);b.type="button";b.setAttribute("aria-pressed",s===cFilter?"true":"false");b.addEventListener("click",()=>{cFilter=s;render()});fb.append(b)})}
+  const list=$("c-list"); list.textContent="";
+  const shown=ST.cmt.filter(c=>cFilter==="Todas"||c.seccion===cFilter).slice().reverse();
+  shown.forEach(c=>{const tags=[el("span","chip sec",c.seccion||"General")];if(c.ref)tags.push(el("span","chip sec",c.ref));
+    list.append(entryLi(c,ps,()=>ST.db.doc("comentarios/"+c.id).delete(),tags))});
+  $("c-empty").hidden=ST.cmt.length>0; $("c-empty").textContent=isLoaded("cmt")?"Todavía no hay comentarios.":"Cargando…";
+}
+
+const TQ_UI={}; // id -> li
+function syncTeamQuestions(ps){
+  const ol=$("tq-list"); const live=new Set(ST.tq.map(q=>q.id));
+  Object.keys(TQ_UI).forEach(id=>{if(!live.has(id)){TQ_UI[id].remove();delete TQ_UI[id];delete ANS_UI["t:"+id]}});
+  ST.tq.forEach((q,i)=>{
+    let li=TQ_UI[q.id];
+    if(!li){li=questionLi("E"+(i+1),q.texto||"","",q.bloqueante===1,"t:"+q.id,[]);TQ_UI[q.id]=li;ol.append(li)}
+    li.querySelector(".num").textContent="E"+(i+1);
+    const tags=li.querySelector(".tags")||(()=>{const t=el("div","tags");li.querySelector(".txt").insertBefore(t,li.querySelector("details.ans"));return t})();
+    tags.textContent=""; if(q.bloqueante===1)tags.append(el("span","chip q","Bloqueante"));
+    tags.append(el("span","chip team","Del equipo"),el("span","chip sec",q.tema||"Otro"));
+    const p=q.autor&&ps[q.autor]; tags.append(el("span","muted",`${(p&&p.name)||q.nombre||"Alguien del equipo"} · ${fmt(q.creado)}`));
+    if(canDelete(q)){const b=el("button","link danger","Eliminar pregunta");b.type="button";b.addEventListener("click",async()=>{
+      if(b.dataset.c!=="1"){b.dataset.c="1";b.textContent="Confirmar: eliminar pregunta y sus respuestas";return}
+      b.disabled=true;try{for(const a of (ST.byQ["t:"+q.id]||[]))await ST.db.doc("respuestas/"+a.id).delete();await ST.db.doc("preguntas/"+q.id).delete()}catch(e){b.textContent="No se pudo eliminar"}});tags.append(b)}
+  });
+  $("tq-empty").hidden=ST.tq.length>0; $("tq-empty").textContent=isLoaded("tq")?"Todavía nadie ha agregado preguntas.":"Cargando…";
+}
+
+/* ---------- Escrituras ---------- */
+// En el archivo descargado se añade el nombre escrito por la persona; en la página en línea solo se guarda su id.
+const withName=o=>(ST.local||ST.remote)?Object.assign(o,{nombre:ST.localName||""}):o;
+async function write(form,op,onOk,okMsg){
+  const btn=form.querySelector("button[type=submit]"); const msg=form.querySelector(".msg");
+  btn.disabled=true; msg.className="msg"; msg.textContent="Guardando…";
+  try{
+    try{await op()}catch(e){if(e&&e.code==="unavailable"){await new Promise(r=>setTimeout(r,600+Math.random()*800));await op()}else throw e}
+    onOk(); msg.textContent=okMsg;
+  }catch(e){
+    msg.className="msg err";
+    if(e&&e.code==="invalid_argument"&&ST.canWriteUnknown){setMode("readonly","Tu acceso a esta página es de solo lectura: puedes leer las respuestas y comentarios, pero no escribir. Pide al propietario acceso de Colaborador.");}
+    else if(e&&e.code==="quota_exceeded")msg.textContent="Se llenó el espacio de la página. Elimina comentarios o respuestas viejos y vuelve a intentarlo.";
+    else msg.textContent="No se pudo guardar. Revisa tu conexión y vuelve a intentarlo.";
+  }finally{btn.disabled=false}
+}
+$("tq-form").addEventListener("submit",ev=>{ev.preventDefault();const ta=$("tq-txt");const txt=ta.value.trim();if(!txt)return;
+  write($("tq-form"),()=>ST.db.collection("preguntas").add(withName({texto:txt,tema:$("tq-tema").value,bloqueante:$("tq-block").value==="1"?1:0,autor:ST.me,creado:new Date().toISOString()})),()=>{ta.value=""},"Pregunta agregada.")});
+$("c-form").addEventListener("submit",ev=>{ev.preventDefault();const ta=$("c-txt");const txt=ta.value.trim();if(!txt)return;
+  write($("c-form"),()=>ST.db.collection("comentarios").add(withName({texto:txt,seccion:$("c-sec").value,ref:$("c-ref").value.trim(),autor:ST.me,creado:new Date().toISOString()})),()=>{ta.value="";$("c-ref").value=""},"Comentario publicado.")});
+
+/* ---------- Conexión ---------- */
+function subscribe(coll,key){
+  let done=false;
+  const timer=setTimeout(()=>{if(!done)setMode(ST.mode,"Todavía no se pudo conectar con las respuestas y comentarios. Lo que ves puede estar incompleto.")},10000);
+  ST.db.collection(coll).orderBy("creado").onSnapshot(snap=>{
+    ST[key]=snap.docs.map(d=>Object.assign({id:d.id},d.data()));
+    if(!snap.metadata.fromCache&&!done){done=true;clearTimeout(timer);ST.loaded[key]=true;
+      if(Object.values(ST.loaded).every(Boolean)&&!ST.err)setMode(ST.mode,ST.mode==="readonly"?$("status").textContent:"")}
+    render();
+  },e=>{done=true;clearTimeout(timer);ST.loaded[key]=true;ST.err=true;setMode(ST.mode,"No se pudieron cargar las respuestas y comentarios. Recarga la página más tarde.");render()});
+}
+/* ---------- Modo archivo descargado: guarda en este navegador ---------- */
+function localDB(){
+  const KEY="requisitos-eventos-sena-v1"; let data={};
+  try{data=JSON.parse(localStorage.getItem(KEY)||"{}")||{}}catch(e){data={}}
+  const subs={};
+  const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){}};
+  const emit=c=>(subs[c]||[]).forEach(f=>f());
+  const snap=c=>({docs:Object.entries(data[c]||{}).map(([id,v])=>({id,data:()=>v})).sort((a,b)=>String(a.data().creado).localeCompare(String(b.data().creado))),metadata:{fromCache:false}});
+  return{
+    collection(c){const q={orderBy(){return q},
+      onSnapshot(next){const f=()=>next(snap(c));(subs[c]=subs[c]||[]).push(f);setTimeout(f,0);return()=>{}},
+      add(v){const id=Date.now().toString(36)+Math.random().toString(36).slice(2,8);(data[c]=data[c]||{})[id]=v;save();emit(c);return Promise.resolve({id})}};return q},
+    doc(path){const [c,id]=path.split("/");return{delete(){if(data[c])delete data[c][id];save();emit(c);return Promise.resolve()}}}
+  };
+}
+function exportText(){
+  const who=x=>x.nombre||"Sin nombre"; const L=[];
+  L.push("# Respuestas y comentarios – Plataforma de eventos SENA Fonseca","",`Exportado: ${new Date().toLocaleString("es-CO")}`,"");
+  L.push("## Respuestas a las preguntas","");
+  QS.forEach(g=>g.q.forEach(q=>{const a=ST.byQ["q"+q[0]]||[];if(!a.length)return;L.push(`### ${q[0]}. ${q[1]}`);a.forEach(x=>L.push(`- ${who(x)} (${fmt(x.creado)}): ${x.texto}`));L.push("")}));
+  L.push("## Preguntas agregadas por el equipo","");
+  if(!ST.tq.length)L.push("(ninguna)","");
+  ST.tq.forEach((q,i)=>{L.push(`### E${i+1}. ${q.texto}`,`Tema: ${q.tema||"Otro"}${q.bloqueante===1?" · Bloqueante":""} · ${who(q)}`);(ST.byQ["t:"+q.id]||[]).forEach(x=>L.push(`- ${who(x)} (${fmt(x.creado)}): ${x.texto}`));L.push("")});
+  L.push("## Comentarios para mejorar","");
+  if(!ST.cmt.length)L.push("(ninguno)");
+  ST.cmt.forEach(c=>L.push(`- [${c.seccion||"General"}${c.ref?" · "+c.ref:""}] ${who(c)} (${fmt(c.creado)}): ${c.texto}`));
+  return L.join("\n");
+}
+/* ---------- Modo GitHub Pages: sincroniza con Supabase ---------- */
+function supaDB(cfg){
+  const base=cfg.url.replace(/\/+$/,"")+"/rest/v1";
+  const H={apikey:cfg.key,"Content-Type":"application/json"};
+  if(/^eyJ/.test(cfg.key))H.Authorization="Bearer "+cfg.key;
+  const TIPO={respuestas:"respuesta",preguntas:"pregunta",comentarios:"comentario"};
+  const COLS="id,tipo,qid,texto,tema,seccion,ref,bloqueante,nombre,creado";
+  let mine; try{mine=new Set(JSON.parse(localStorage.getItem("req-mias")||"[]"))}catch(e){mine=new Set()}
+  const saveMine=()=>{try{localStorage.setItem("req-mias",JSON.stringify([...mine]))}catch(e){}};
+  let clave=null; try{clave=localStorage.getItem("req-clave")}catch(e){}
+  if(!clave||clave.length<16){clave=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2));try{localStorage.setItem("req-clave",clave)}catch(e){}}
+  const subs={}; let timer=null, ok=null;
+  function status(good){if(good===ok)return;ok=good;if(good)setMode("ok","");else setMode("ok","Sin conexión con la base de datos del equipo. Se vuelve a intentar sola cada pocos segundos.")}
+  async function pull(){
+    const r=await fetch(`${base}/entradas?select=${COLS}&order=creado.asc&limit=1000`,{headers:H,cache:"no-store"});
+    if(!r.ok)throw new Error("HTTP "+r.status);
+    const rows=await r.json();
+    Object.entries(TIPO).forEach(([c,t])=>{
+      const docs=rows.filter(x=>x.tipo===t).map(x=>{const v=Object.assign({},x,{autor:mine.has(x.id)?"me":"otro"});delete v.id;delete v.tipo;return{id:x.id,data:()=>v}});
+      (subs[c]||[]).forEach(f=>f({docs,metadata:{fromCache:false}}));
+    });
+  }
+  async function tick(){try{await pull();status(true)}catch(e){status(false)}}
+  function start(){if(timer)return;setTimeout(tick,0);timer=setInterval(()=>{if(!document.hidden)tick()},8000);document.addEventListener("visibilitychange",()=>{if(!document.hidden)tick()})}
+  const fail=r=>{const e=new Error("HTTP "+r.status);e.code=r.status===400||r.status===401||r.status===403?"invalid_argument":"unavailable";return e};
+  return{
+    collection(c){const q={orderBy(){return q},
+      onSnapshot(next){(subs[c]=subs[c]||[]).push(next);start();return()=>{}},
+      async add(v){
+        const body={tipo:TIPO[c],clave};["qid","texto","tema","seccion","ref","bloqueante","nombre"].forEach(k=>{if(v[k]!==undefined&&v[k]!==null)body[k]=v[k]});
+        const r=await fetch(`${base}/entradas?select=id`,{method:"POST",headers:Object.assign({Prefer:"return=representation"},H),body:JSON.stringify(body)});
+        if(!r.ok)throw fail(r);
+        const out=await r.json(); const id=out&&out[0]&&out[0].id; if(id){mine.add(id);saveMine()}
+        tick(); return{id};
+      }};return q},
+    doc(path){const id=path.split("/")[1];return{async delete(){
+      const r=await fetch(`${base}/rpc/borrar_entrada`,{method:"POST",headers:H,body:JSON.stringify({p_id:id,p_clave:clave})});
+      if(!r.ok)throw fail(r); mine.delete(id); saveMine(); tick();
+    }}}
+  };
+}
+function setupNameAndExport(){
+  try{ST.localName=localStorage.getItem("requisitos-eventos-sena-nombre")||""}catch(e){ST.localName=""}
+  const inp=$("local-name"); inp.value=ST.localName;
+  inp.addEventListener("input",()=>{ST.localName=inp.value.trim();try{localStorage.setItem("requisitos-eventos-sena-nombre",ST.localName)}catch(e){}});
+  $("local-export").addEventListener("click",()=>{
+    const blob=new Blob([exportText()],{type:"text/markdown;charset=utf-8"});const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);a.download="respuestas-requisitos-eventos.md";document.body.append(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href),2000);$("local-msg").textContent="Archivo descargado: respuestas-requisitos-eventos.md";});
+  $("local-box").hidden=false;
+}
+function startRemote(cfg){
+  ST.remote=true; ST.db=supaDB(cfg); ST.me="me"; ST.canEdit=false;
+  setupNameAndExport();
+  $("local-text").innerHTML="<b>Página compartida del equipo.</b> Todo lo que escribas aquí lo ve la instructora y el resto del equipo. Escribe tu nombre para que sepan quién respondió. Solo puedes borrar lo que escribiste desde este navegador.";
+  setMode("ok","Cargando las respuestas y comentarios del equipo…");
+  subscribe("respuestas","ans"); subscribe("comentarios","cmt"); subscribe("preguntas","tq");
+}
+function startLocal(){
+  ST.local=true; ST.db=localDB(); ST.me="local"; ST.canEdit=true;
+  setupNameAndExport();
+  setMode("ok","");
+  subscribe("respuestas","ans"); subscribe("comentarios","cmt"); subscribe("preguntas","tq");
+}
+(async()=>{
+  const cfg=window.SUPA_CONFIG;
+  if(cfg&&cfg.url&&cfg.key){startRemote(cfg);return}
+  const C=window.claude;
+  if(!C||typeof C.use!=="function"){startLocal();return}
+  let db=null,user=null;
+  try{[db,user]=await Promise.all([C.use("db"),C.use("user")])}catch(e){}
+  if(!db){setMode("offline","Para leer y escribir respuestas y comentarios, abre esta página en claude.ai con tu sesión iniciada.");render();return}
+  ST.db=db; ST.user=user;
+  if(user){ST.me=await user.id();ST.canEdit=await user.canEdit()}
+  const cw=user?await user.can("data.write"):null; ST.canWriteUnknown=cw===null;
+  if(cw===false)setMode("readonly","Tu acceso a esta página es de solo lectura: puedes leer las respuestas y comentarios, pero no escribir. Pide al propietario acceso de Colaborador.");
+  else setMode("ok","Cargando las respuestas y comentarios del equipo…");
+  subscribe("respuestas","ans"); subscribe("comentarios","cmt"); subscribe("preguntas","tq");
+})();
+render();
+</script>
+
+</body>
+</html>

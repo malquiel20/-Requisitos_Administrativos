@@ -16,14 +16,29 @@ create table if not exists public.entradas (
   creado      timestamptz not null default now()
 );
 
+-- Cambios en los requisitos (editar, agregar, eliminar, recuperar, volver al original).
+-- Cada cambio es una fila nueva: nunca se sobrescribe nada, así queda el historial.
+alter table public.entradas add column if not exists req       text check (char_length(req) <= 80);
+alter table public.entradas add column if not exists accion    text check (accion in ('agregar', 'editar', 'eliminar', 'recuperar', 'original'));
+alter table public.entradas add column if not exists rid       text check (char_length(rid) <= 20);
+alter table public.entradas add column if not exists grupo     text check (char_length(grupo) <= 80);
+alter table public.entradas add column if not exists prioridad text check (prioridad in ('A', 'M', 'B'));
+alter table public.entradas add column if not exists dudoso    int  not null default 0 check (dudoso in (0, 1));
+
+alter table public.entradas drop constraint if exists entradas_tipo_check;
+alter table public.entradas add constraint entradas_tipo_check
+  check (tipo in ('respuesta', 'pregunta', 'comentario', 'requisito'));
+
 -- Reglas de acceso: cualquiera con el enlace puede leer y escribir,
 -- pero nadie puede leer la "clave" con la que cada navegador borra lo suyo.
 alter table public.entradas enable row level security;
 
 revoke all on public.entradas from anon, authenticated;
-grant select (id, tipo, qid, texto, tema, seccion, ref, bloqueante, nombre, creado)
+grant select (id, tipo, qid, texto, tema, seccion, ref, bloqueante, nombre, creado,
+              req, accion, rid, grupo, prioridad, dudoso)
   on public.entradas to anon, authenticated;
-grant insert (tipo, qid, texto, tema, seccion, ref, bloqueante, nombre, clave)
+grant insert (tipo, qid, texto, tema, seccion, ref, bloqueante, nombre, clave,
+              req, accion, rid, grupo, prioridad, dudoso)
   on public.entradas to anon, authenticated;
 
 drop policy if exists "leer" on public.entradas;

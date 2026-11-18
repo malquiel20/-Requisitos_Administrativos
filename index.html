@@ -146,6 +146,21 @@ textarea{resize:vertical;min-height:4.5rem}
 .msg.err{color:var(--pri-a)}
 body:not([data-mode="ok"]) .writeui{display:none}
 
+/* Requisitos editables */
+td.rtxt{min-width:0}
+.rmeta{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem;margin-top:.35rem;font-size:.82rem}
+.chip.edit-chip{background:var(--pri-b-soft);color:var(--pri-b)}
+.chip.del-chip{background:var(--sunk);color:var(--muted);border:1px solid var(--line)}
+tr.deleted td{color:var(--muted)}
+tr.deleted .rbody{text-decoration:line-through}
+details.rhist{margin-top:.35rem}
+details.rhist>summary{cursor:pointer;color:var(--muted);font-size:.82rem}
+details.rhist .entries{margin-top:.4rem}
+tr.edit-row>td{background:var(--accent-soft)}
+.req-editor{margin:0}
+.re-title{font-family:var(--font-display);font-weight:700}
+.add-req{align-self:flex-start}
+
 /* Pasos y fuentes */
 ol.steps{margin:0;padding-left:1.3rem;display:flex;flex-direction:column;gap:var(--s2)}
 .sources{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,17rem),1fr));gap:var(--s3)}
@@ -217,8 +232,9 @@ footer{font-size:.9rem;color:var(--muted);border-top:1px solid var(--line);paddi
   </section>
 
   <section id="funcionales">
-    <span class="eyebrow">35 requisitos</span>
+    <span class="eyebrow" id="rf-count">35 requisitos</span>
     <h2>Requisitos funcionales</h2>
+    <p class="muted">Puedes <b>editar</b> cualquier requisito o <b>agregar</b> uno nuevo en cada grupo. Cada cambio queda guardado en su <b>historial</b> con el nombre de quien lo hizo, y siempre se puede volver al texto original.</p>
     <div class="legend">
       <span><span class="chip A">Imprescindible</span> lo pidió la instructora</span>
       <span><span class="chip M">Importante</span></span>
@@ -232,7 +248,7 @@ footer{font-size:.9rem;color:var(--muted);border-top:1px solid var(--line);paddi
       <button type="button" id="f-B" data-f="B" aria-pressed="false">Deseables</button>
     </div>
     <div id="rf" class="stack" style="gap:var(--s5)"></div>
-    <p class="muted">¿Falta algo o hay que corregir un requisito? Déjalo en <a href="#comentarios">Comentarios</a> indicando su ID.</p>
+    <p class="muted">¿Tienes una duda sobre un requisito y no quieres cambiarlo todavía? Déjala en <a href="#comentarios">Comentarios</a> indicando su ID.</p>
   </section>
 
   <section id="roles">
@@ -245,12 +261,9 @@ footer{font-size:.9rem;color:var(--muted);border-top:1px solid var(--line);paddi
   </section>
 
   <section id="no-funcionales">
-    <span class="eyebrow">Calidad</span>
+    <span class="eyebrow" id="rnf-count">8 requisitos</span>
     <h2>Requisitos no funcionales</h2>
-    <div class="tbl"><table>
-      <thead><tr><th>ID</th><th>Requisito</th></tr></thead>
-      <tbody id="rnf-body"></tbody>
-    </table></div>
+    <div id="rnf" class="stack"></div>
   </section>
 
   <section id="preguntas">
@@ -469,9 +482,7 @@ const el=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className
 
 /* ---------- Contenido estático ---------- */
 $("phases").innerHTML=PHASES.map(p=>`<div class="phase"><span class="n">${p.n}</span><h3>${p.t}</h3><ul>${p.items.map(i=>`<li>${esc(i)}</li>`).join("")}</ul><div class="docs"><b>Documentos:</b> ${esc(p.docs)}</div></div>`).join("");
-$("rf").innerHTML=RF.map(g=>`<div class="group"><h3>${esc(g.g)}</h3><div class="tbl"><table><thead><tr><th>ID</th><th>Requisito</th><th>Prioridad</th></tr></thead><tbody>${g.r.map(r=>`<tr data-p="${r[2]}"><td class="id">${r[0]}</td><td>${esc(r[1])}${r[3]?` <span class="doubt">· por confirmar</span>`:""}</td><td class="pri"><span class="chip ${r[2]}">${PRI[r[2]]}</span></td></tr>`).join("")}</tbody></table></div></div>`).join("");
 $("roles-body").innerHTML=ROLES.map(r=>`<tr><td><b>${esc(r[0])}</b></td><td>${esc(r[1])}</td></tr>`).join("");
-$("rnf-body").innerHTML=RNF.map(r=>`<tr><td class="id">${r[0]}</td><td>${esc(r[1])}</td></tr>`).join("");
 $("tq-tema").innerHTML=QS.map(g=>`<option>${esc(g.g)}</option>`).join("")+"<option>Otro</option>";
 $("c-sec").innerHTML=SECTIONS.map(s=>`<option>${esc(s)}</option>`).join("");
 
@@ -503,10 +514,12 @@ QS.forEach(g=>{const box=el("div","qgroup");box.append(el("h3","",g.g));const ol
 
 /* ---------- Filtros ---------- */
 function press(sel,btn){document.querySelectorAll(sel).forEach(b=>b.setAttribute("aria-pressed",b===btn?"true":"false"))}
-document.querySelectorAll("[data-f]").forEach(b=>b.addEventListener("click",()=>{
-  const f=b.dataset.f;press("[data-f]",b);
-  document.querySelectorAll("#rf .group").forEach(g=>{let any=false;g.querySelectorAll("tbody tr").forEach(tr=>{const show=f==="all"||tr.dataset.p===f;tr.hidden=!show;if(show)any=true});g.hidden=!any});
-}));
+let pFilter="all";
+function applyPFilter(){
+  document.querySelectorAll("#rf .group").forEach(g=>{let any=false;g.querySelectorAll("tbody tr:not(.edit-row)").forEach(tr=>{const show=pFilter==="all"||tr.dataset.p===pFilter;tr.hidden=!show;if(show)any=true});
+    g.hidden=!any&&!(ST.edit&&ST.edit.mode==="add"&&ST.edit.grupo===g.dataset.g)});
+}
+document.querySelectorAll("[data-f]").forEach(b=>b.addEventListener("click",()=>{pFilter=b.dataset.f;press("[data-f]",b);applyPFilter()}));
 let qFilter="all";
 function applyQFilter(){
   document.querySelectorAll("#qs .qgroup").forEach(g=>{let any=false;g.querySelectorAll("ol.qs > li").forEach(li=>{
@@ -517,7 +530,7 @@ document.querySelectorAll("[data-q]").forEach(b=>b.addEventListener("click",()=>
 let cFilter="Todas";
 
 /* ---------- Estado compartido ---------- */
-const ST={db:null,user:null,me:null,canEdit:false,ans:[],cmt:[],tq:[],byQ:{},loaded:{ans:false,cmt:false,tq:false},err:false,mode:"loading"};
+const ST={db:null,user:null,me:null,canEdit:false,ans:[],cmt:[],tq:[],req:[],byQ:{},loaded:{ans:false,cmt:false,tq:false,req:false},err:false,mode:"loading",edit:null,openHist:new Set()};
 function setMode(m,msg){ST.mode=m;document.body.dataset.mode=m;const s=$("status");if(msg){s.textContent=msg;s.hidden=false}else s.hidden=true}
 setMode("loading","Cargando las respuestas y comentarios del equipo…");
 
@@ -546,10 +559,11 @@ let renderToken=0;
 async function render(){
   const token=++renderToken;
   ST.byQ={}; ST.ans.forEach(a=>{(ST.byQ[a.qid]=ST.byQ[a.qid]||[]).push(a)});
-  const ids=[...new Set([...ST.ans,...ST.cmt,...ST.tq].map(x=>x.autor).filter(Boolean))];
+  const ids=[...new Set([...ST.ans,...ST.cmt,...ST.tq,...ST.req].map(x=>x.autor).filter(Boolean))];
   let ps={}; if(ST.user&&ids.length){try{ps=await ST.user.profiles(ids)}catch(e){ps={}}}
   if(token!==renderToken)return;
 
+  renderReqs(ps);
   syncTeamQuestions(ps);
 
   Object.entries(ANS_UI).forEach(([qid,ui])=>{
@@ -588,6 +602,141 @@ function syncTeamQuestions(ps){
       b.disabled=true;try{for(const a of (ST.byQ["t:"+q.id]||[]))await ST.db.doc("respuestas/"+a.id).delete();await ST.db.doc("preguntas/"+q.id).delete()}catch(e){b.textContent="No se pudo eliminar"}});tags.append(b)}
   });
   $("tq-empty").hidden=ST.tq.length>0; $("tq-empty").textContent=isLoaded("tq")?"Todavía nadie ha agregado preguntas.":"Cargando…";
+}
+
+/* ---------- Requisitos editables ----------
+   Registro de cambios de solo agregar: cada edición es una entrada nueva en "requisitos"
+   (accion: agregar | editar | eliminar | recuperar | original). El estado actual sale de
+   aplicar todas las entradas en orden sobre los requisitos originales, así nada se pierde. */
+const RNF_GROUP="No funcionales";
+const GROUPS=[...RF.map(g=>g.g),RNF_GROUP];
+const ACC={agregar:"Agregó el requisito",editar:"Editó",eliminar:"Eliminó el requisito",recuperar:"Recuperó el requisito",original:"Volvió al texto original"};
+function reqState(){
+  const map={}, order=[];
+  const put=(it)=>{map[it.key]=it;order.push(it.key)};
+  RF.forEach(g=>g.r.forEach(r=>put({key:r[0],rid:r[0],grupo:g.g,texto:r[1],prioridad:r[2],dudoso:!!r[3],baseTexto:r[1],basePri:r[2],baseDud:!!r[3],origen:"base",estado:"original",hist:[]})));
+  RNF.forEach(r=>put({key:r[0],rid:r[0],grupo:RNF_GROUP,texto:r[1],prioridad:null,dudoso:false,baseTexto:r[1],basePri:null,baseDud:false,origen:"base",estado:"original",hist:[]}));
+  const used=new Set(order);
+  ST.req.forEach(e=>{
+    if(e.accion==="agregar"){
+      if(!GROUPS.includes(e.grupo))return;
+      let rid=e.rid||"RF-?"; if(used.has(rid)){let s=98;while(used.has(rid+String.fromCharCode(s)))s++;rid=rid+String.fromCharCode(s)} used.add(rid);
+      put({key:"n:"+e.id,rid,grupo:e.grupo,texto:e.texto,prioridad:e.grupo===RNF_GROUP?null:(e.prioridad||"M"),dudoso:!!e.dudoso,origen:"nuevo",estado:"nuevo",hist:[e],creador:e});return;
+    }
+    const it=map[e.req]; if(!it)return; it.hist.push(e); it.ultimo=e;
+    if(e.accion==="editar"){it.texto=e.texto;if(it.grupo!==RNF_GROUP&&e.prioridad)it.prioridad=e.prioridad;it.dudoso=!!e.dudoso;if(it.origen==="base")it.estado="editado"}
+    else if(e.accion==="eliminar")it.eliminado=true;
+    else if(e.accion==="recuperar")it.eliminado=false;
+    else if(e.accion==="original"&&it.origen==="base"){it.texto=it.baseTexto;it.prioridad=it.basePri;it.dudoso=it.baseDud;it.estado="original";it.eliminado=false}
+  });
+  const all=order.map(k=>map[k]); const byGroup={}; all.forEach(it=>(byGroup[it.grupo]=byGroup[it.grupo]||[]).push(it));
+  return{map,all,byGroup};
+}
+function nextId(grupo){
+  const pre=grupo===RNF_GROUP?"RNF-":"RF-"; let max=0;
+  (ST.reqAll||[]).forEach(it=>{if(it.rid.startsWith(pre)){const n=parseInt(it.rid.slice(pre.length),10);if(n>max)max=n}});
+  return pre+String(max+1).padStart(2,"0");
+}
+function personName(e,ps){const p=e&&e.autor&&ps[e.autor];return (p&&p.name)||(e&&e.nombre)||"Alguien del equipo"}
+
+const editor=el("form","box req-editor writeui");
+editor.innerHTML=`<p class="re-title"></p>
+<div class="field"><label for="re-txt">Texto del requisito</label><textarea id="re-txt" rows="4" maxlength="2000" required></textarea></div>
+<div class="fields">
+  <div class="field re-pri-f"><label for="re-pri">Prioridad</label><select id="re-pri"><option value="A">Imprescindible</option><option value="M">Importante</option><option value="B">Deseable</option></select></div>
+  <div class="field"><label for="re-dud">Estado</label><select id="re-dud"><option value="0">Confirmado</option><option value="1">Por confirmar con la instructora</option></select></div>
+</div>
+<div class="row"><button type="submit" class="btn re-save">Guardar cambios</button><button type="button" class="btn ghost re-cancel">Cancelar</button><button type="button" class="link re-orig">Volver al texto original</button><button type="button" class="link danger re-del">Eliminar requisito</button><span class="msg" role="status"></span></div>`;
+const eq=s=>editor.querySelector(s);
+function openEdit(key){
+  const it=ST.reqMap[key]; if(!it)return;
+  ST.edit={mode:"edit",key};
+  eq(".re-title").textContent="Editar "+it.rid; eq("#re-txt").value=it.texto; eq("#re-pri").value=it.prioridad||"A"; eq("#re-dud").value=it.dudoso?"1":"0";
+  eq(".re-pri-f").hidden=it.grupo===RNF_GROUP; eq(".re-orig").hidden=!(it.origen==="base"&&it.estado==="editado");
+  eq(".re-del").hidden=false; eq(".re-del").dataset.c=""; eq(".re-del").textContent="Eliminar requisito";
+  eq(".re-save").textContent="Guardar cambios"; eq(".msg").textContent="";
+  render().then(()=>eq("#re-txt").focus());
+}
+function openAdd(grupo){
+  ST.edit={mode:"add",grupo};
+  eq(".re-title").textContent=`Nuevo requisito en ${grupo} (${nextId(grupo)})`; eq("#re-txt").value=""; eq("#re-pri").value="M"; eq("#re-dud").value="0";
+  eq(".re-pri-f").hidden=grupo===RNF_GROUP; eq(".re-orig").hidden=true; eq(".re-del").hidden=true;
+  eq(".re-save").textContent="Agregar requisito"; eq(".msg").textContent="";
+  render().then(()=>eq("#re-txt").focus());
+}
+function closeEditor(){ST.edit=null;editor.remove();render()}
+const reqAdd=entry=>ST.db.collection("requisitos").add(withName(Object.assign(entry,{autor:ST.me,creado:new Date().toISOString()})));
+editor.addEventListener("submit",ev=>{
+  ev.preventDefault(); if(!ST.edit)return; const txt=eq("#re-txt").value.trim(); if(!txt)return;
+  const grupo=ST.edit.mode==="add"?ST.edit.grupo:(ST.reqMap[ST.edit.key]||{}).grupo;
+  const pri=grupo===RNF_GROUP?null:eq("#re-pri").value, dud=eq("#re-dud").value==="1"?1:0;
+  let entry;
+  if(ST.edit.mode==="add")entry={accion:"agregar",grupo,rid:nextId(grupo),texto:txt,prioridad:pri,dudoso:dud};
+  else{const it=ST.reqMap[ST.edit.key];if(!it)return closeEditor();
+    if(it.texto===txt&&(it.prioridad||null)===pri&&(it.dudoso?1:0)===dud)return closeEditor();
+    entry={accion:"editar",req:it.key,texto:txt,prioridad:pri,dudoso:dud}}
+  write(editor,()=>reqAdd(entry),closeEditor,"");
+});
+eq(".re-cancel").addEventListener("click",closeEditor);
+eq(".re-del").addEventListener("click",()=>{const b=eq(".re-del");if(!ST.edit||ST.edit.mode!=="edit")return;
+  if(b.dataset.c!=="1"){b.dataset.c="1";b.textContent="Confirmar: eliminar este requisito";return}
+  const key=ST.edit.key; write(editor,()=>reqAdd({accion:"eliminar",req:key,texto:"Eliminado"}),closeEditor,"")});
+eq(".re-orig").addEventListener("click",()=>{if(!ST.edit||ST.edit.mode!=="edit")return;const key=ST.edit.key;
+  write(editor,()=>reqAdd({accion:"original",req:key,texto:"Texto original"}),closeEditor,"")});
+async function act(entry,btn){btn.disabled=true;try{await reqAdd(entry)}catch(e){btn.disabled=false;btn.textContent="No se pudo guardar; reintenta"}}
+
+let reqSig="";
+function renderReqs(ps){
+  const S=reqState(); ST.reqMap=S.map; ST.reqAll=S.all;
+  const sig=JSON.stringify([ST.req.map(e=>e.id),ST.edit,ST.mode,Object.keys(ps).length,ST.req.map(e=>personName(e,ps))]);
+  if(sig===reqSig)return; reqSig=sig;
+  const active=S.all.filter(x=>!x.eliminado);
+  $("rf-count").textContent=`${active.filter(x=>x.grupo!==RNF_GROUP).length} requisitos`;
+  $("rnf-count").textContent=`${active.filter(x=>x.grupo===RNF_GROUP).length} requisitos`;
+  // Conservar el foco y la posición del cursor del editor al reconstruir las tablas
+  const fa=document.activeElement, inEd=fa&&editor.contains(fa), sel=inEd&&"selectionStart" in fa?[fa.selectionStart,fa.selectionEnd]:null;
+  const rf=$("rf"); rf.textContent=""; RF.forEach(g=>rf.append(groupBlock(g.g,S.byGroup[g.g]||[],true,ps,false)));
+  const rn=$("rnf"); rn.textContent=""; rn.append(groupBlock(RNF_GROUP,S.byGroup[RNF_GROUP]||[],false,ps,true));
+  if(inEd&&editor.isConnected){fa.focus();if(sel)try{fa.setSelectionRange(sel[0],sel[1])}catch(e){}}
+  applyPFilter();
+}
+function groupBlock(g,items,withPri,ps,noTitle){
+  const box=el("div","group"); box.dataset.g=g; if(!noTitle)box.append(el("h3","",g));
+  const wrap=el("div","tbl"), t=el("table"); t.innerHTML=`<thead><tr><th>ID</th><th>Requisito</th>${withPri?"<th>Prioridad</th>":""}</tr></thead>`;
+  const tb=el("tbody"); t.append(tb); wrap.append(t); box.append(wrap);
+  items.forEach(it=>{
+    const tr=el("tr",it.eliminado?"deleted":""); tr.dataset.p=it.prioridad||""; tr.dataset.key=it.key;
+    tr.append(el("td","id",it.rid));
+    const td=el("td","rtxt"); td.append(el("span","rbody",it.texto));
+    if(it.dudoso&&!it.eliminado)td.append(" ",el("span","doubt","· por confirmar"));
+    const meta=el("div","rmeta");
+    if(it.eliminado)meta.append(el("span","chip del-chip","Eliminado"),el("span","muted",`${personName(it.ultimo,ps)} · ${fmt(it.ultimo&&it.ultimo.creado)}`));
+    else if(it.origen==="nuevo")meta.append(el("span","chip team","Nuevo"),el("span","muted",`${personName(it.creador,ps)} · ${fmt(it.creador.creado)}`));
+    else if(it.estado==="editado")meta.append(el("span","chip edit-chip","Editado"),el("span","muted",`${personName(it.ultimo,ps)} · ${fmt(it.ultimo.creado)}`));
+    if(ST.mode==="ok"&&!(ST.edit&&ST.edit.mode==="edit"&&ST.edit.key===it.key)){
+      const b=el("button","link",it.eliminado?"Recuperar":"Editar"); b.type="button";
+      b.addEventListener("click",()=>it.eliminado?act({accion:"recuperar",req:it.key,texto:"Recuperado"},b):openEdit(it.key));
+      meta.append(b);
+    }
+    if(meta.childNodes.length)td.append(meta);
+    const nChanges=it.hist.length-(it.origen==="nuevo"?1:0);
+    if(nChanges>0){
+      const d=el("details","rhist"); d.append(el("summary","",`Historial (${it.hist.length})`)); const ul=el("ul","entries");
+      it.hist.slice().reverse().forEach(e=>{const li=el("li","entry"),w=el("div","who");w.append(el("b","",personName(e,ps)),el("span","",fmt(e.creado)),el("span","",ACC[e.accion]||e.accion));li.append(w);
+        if(e.accion==="editar"||e.accion==="agregar")li.append(el("p","body",e.texto+(e.prioridad&&it.grupo!==RNF_GROUP?` (${PRI[e.prioridad]})`:"")));ul.append(li)});
+      if(it.origen==="base"){const li=el("li","entry");li.append(el("div","who","Texto original"),el("p","body",it.baseTexto));ul.append(li)}
+      d.append(ul); d.open=ST.openHist.has(it.key);
+      d.addEventListener("toggle",()=>{d.open?ST.openHist.add(it.key):ST.openHist.delete(it.key)});
+      td.append(d);
+    }
+    tr.append(td);
+    if(withPri){const c=el("td","pri");if(it.prioridad)c.append(el("span","chip "+it.prioridad,PRI[it.prioridad]));tr.append(c)}
+    tb.append(tr);
+    if(ST.edit&&ST.edit.mode==="edit"&&ST.edit.key===it.key){const er=el("tr","edit-row"),c=el("td");c.colSpan=withPri?3:2;c.append(editor);er.append(c);tb.append(er)}
+  });
+  if(ST.edit&&ST.edit.mode==="add"&&ST.edit.grupo===g)box.append(editor);
+  else if(ST.mode==="ok"){const b=el("button","btn ghost add-req",noTitle?"+ Agregar requisito no funcional":`+ Agregar requisito en ${g}`);b.type="button";b.addEventListener("click",()=>openAdd(g));box.append(b)}
+  return box;
 }
 
 /* ---------- Escrituras ---------- */
@@ -639,7 +788,16 @@ function localDB(){
 }
 function exportText(){
   const who=x=>x.nombre||"Sin nombre"; const L=[];
-  L.push("# Respuestas y comentarios – Plataforma de eventos SENA Fonseca","",`Exportado: ${new Date().toLocaleString("es-CO")}`,"");
+  L.push("# Requisitos, respuestas y comentarios – Plataforma de eventos SENA Fonseca","",`Exportado: ${new Date().toLocaleString("es-CO")}`,"");
+  const RS=reqState();
+  L.push("## Requisitos (estado actual)","");
+  GROUPS.forEach(g=>{const it=(RS.byGroup[g]||[]).filter(x=>!x.eliminado);if(!it.length)return;L.push(`### ${g==="No funcionales"?"Requisitos no funcionales":g}`);
+    it.forEach(x=>L.push(`- **${x.rid}** ${x.texto}${x.prioridad?` _(${PRI[x.prioridad]})_`:""}${x.dudoso?" · por confirmar":""}${x.origen==="nuevo"?" · nuevo":x.estado==="editado"?" · editado":""}`));L.push("")});
+  const delR=RS.all.filter(x=>x.eliminado); if(delR.length){L.push("### Eliminados");delR.forEach(x=>L.push(`- ~~${x.rid} ${x.texto}~~`));L.push("")}
+  L.push("## Historial de cambios en los requisitos","");
+  if(!ST.req.length)L.push("(sin cambios)");
+  ST.req.forEach(e=>{const it=RS.map[e.accion==="agregar"?"n:"+e.id:e.req];L.push(`- ${fmt(e.creado)} · ${who(e)} · ${ACC[e.accion]||e.accion} ${it?it.rid:""}${e.accion==="editar"||e.accion==="agregar"?": "+e.texto:""}`)});
+  L.push("");
   L.push("## Respuestas a las preguntas","");
   QS.forEach(g=>g.q.forEach(q=>{const a=ST.byQ["q"+q[0]]||[];if(!a.length)return;L.push(`### ${q[0]}. ${q[1]}`);a.forEach(x=>L.push(`- ${who(x)} (${fmt(x.creado)}): ${x.texto}`));L.push("")}));
   L.push("## Preguntas agregadas por el equipo","");
@@ -655,8 +813,8 @@ function supaDB(cfg){
   const base=cfg.url.replace(/\/+$/,"")+"/rest/v1";
   const H={apikey:cfg.key,"Content-Type":"application/json"};
   if(/^eyJ/.test(cfg.key))H.Authorization="Bearer "+cfg.key;
-  const TIPO={respuestas:"respuesta",preguntas:"pregunta",comentarios:"comentario"};
-  const COLS="id,tipo,qid,texto,tema,seccion,ref,bloqueante,nombre,creado";
+  const TIPO={respuestas:"respuesta",preguntas:"pregunta",comentarios:"comentario",requisitos:"requisito"};
+  const COLS="id,tipo,qid,texto,tema,seccion,ref,bloqueante,nombre,creado,req,accion,rid,grupo,prioridad,dudoso";
   let mine; try{mine=new Set(JSON.parse(localStorage.getItem("req-mias")||"[]"))}catch(e){mine=new Set()}
   const saveMine=()=>{try{localStorage.setItem("req-mias",JSON.stringify([...mine]))}catch(e){}};
   let clave=null; try{clave=localStorage.getItem("req-clave")}catch(e){}
@@ -679,7 +837,7 @@ function supaDB(cfg){
     collection(c){const q={orderBy(){return q},
       onSnapshot(next){(subs[c]=subs[c]||[]).push(next);start();return()=>{}},
       async add(v){
-        const body={tipo:TIPO[c],clave};["qid","texto","tema","seccion","ref","bloqueante","nombre"].forEach(k=>{if(v[k]!==undefined&&v[k]!==null)body[k]=v[k]});
+        const body={tipo:TIPO[c],clave};["qid","texto","tema","seccion","ref","bloqueante","nombre","req","accion","rid","grupo","prioridad","dudoso"].forEach(k=>{if(v[k]!==undefined&&v[k]!==null)body[k]=v[k]});
         const r=await fetch(`${base}/entradas?select=id`,{method:"POST",headers:Object.assign({Prefer:"return=representation"},H),body:JSON.stringify(body)});
         if(!r.ok)throw fail(r);
         const out=await r.json(); const id=out&&out[0]&&out[0].id; if(id){mine.add(id);saveMine()}
@@ -706,13 +864,13 @@ function startRemote(cfg){
   setupNameAndExport();
   $("local-text").innerHTML="<b>Página compartida del equipo.</b> Todo lo que escribas aquí lo ve la instructora y el resto del equipo. Escribe tu nombre para que sepan quién respondió. Solo puedes borrar lo que escribiste desde este navegador.";
   setMode("ok","Cargando las respuestas y comentarios del equipo…");
-  subscribe("respuestas","ans"); subscribe("comentarios","cmt"); subscribe("preguntas","tq");
+  subscribe("respuestas","ans"); subscribe("comentarios","cmt"); subscribe("preguntas","tq"); subscribe("requisitos","req");
 }
 function startLocal(){
   ST.local=true; ST.db=localDB(); ST.me="local"; ST.canEdit=true;
   setupNameAndExport();
   setMode("ok","");
-  subscribe("respuestas","ans"); subscribe("comentarios","cmt"); subscribe("preguntas","tq");
+  subscribe("respuestas","ans"); subscribe("comentarios","cmt"); subscribe("preguntas","tq"); subscribe("requisitos","req");
 }
 (async()=>{
   const cfg=window.SUPA_CONFIG;
@@ -727,7 +885,7 @@ function startLocal(){
   const cw=user?await user.can("data.write"):null; ST.canWriteUnknown=cw===null;
   if(cw===false)setMode("readonly","Tu acceso a esta página es de solo lectura: puedes leer las respuestas y comentarios, pero no escribir. Pide al propietario acceso de Colaborador.");
   else setMode("ok","Cargando las respuestas y comentarios del equipo…");
-  subscribe("respuestas","ans"); subscribe("comentarios","cmt"); subscribe("preguntas","tq");
+  subscribe("respuestas","ans"); subscribe("comentarios","cmt"); subscribe("preguntas","tq"); subscribe("requisitos","req");
 })();
 render();
 </script>

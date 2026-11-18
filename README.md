@@ -6,7 +6,8 @@ Página de levantamiento de requisitos de la **plataforma web para la gestión i
 
 En la página se puede:
 
-- Leer el problema, las fases del evento, los 35 requisitos funcionales, los roles y los requisitos no funcionales.
+- Leer el problema, las fases del evento, los roles y los requisitos.
+- **Editar los requisitos** funcionales y no funcionales, **agregar** nuevos, eliminarlos o recuperarlos. Cada cambio queda en el historial del requisito con el nombre de quien lo hizo, y siempre se puede volver al texto original.
 - **Responder las 39 preguntas** para la instructora y el equipo.
 - **Agregar preguntas** nuevas.
 - **Dejar comentarios** para mejorar los requisitos.
@@ -32,7 +33,7 @@ Todo lo que se escribe se guarda en una base de datos compartida (Supabase), as�
 
 ### 2. Crear la base de datos en Supabase
 1. Entra en https://supabase.com, crea una cuenta gratuita y pulsa **New project**. Ponle un nombre (por ejemplo `requisitos-eventos`), una contraseña y la región más cercana.
-2. Cuando el proyecto esté listo, abre **SQL Editor → New query**, pega todo el contenido de `supabase.sql` y pulsa **Run**. Debe decir *Success*.
+2. Cuando el proyecto esté listo, abre **SQL Editor → New query**, pega todo el contenido de `supabase.sql` y pulsa **Run**. Debe decir *Success*. (Si ya lo habías ejecutado antes, ejecútalo otra vez: añade lo necesario para editar requisitos sin borrar nada.)
 3. Abre **Project Settings → API** (o el botón **Connect**) y copia:
    - **Project URL** (algo como `https://abcdefghijklmn.supabase.co`)
    - la clave **publishable** o **anon public**

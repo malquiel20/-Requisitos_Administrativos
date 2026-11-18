@@ -1,6 +1,6 @@
 # Plataforma web para la gestión integral de eventos institucionales – SENA Fonseca
 
-**Levantamiento de requisitos (borrador v0.2)**
+**Levantamiento de requisitos (borrador v0.3)**
 Fecha: 13 de noviembre de 2026
 Fuentes: 3 audios de la clase con la instructora + póster de la 2ª Feria GEN-INNOVA + pizarra "Fases del proceso administrativo del evento".
 
@@ -68,67 +68,109 @@ La instructora usa las etapas del **proceso administrativo** (planear, organizar
 
 ## 4. Requisitos funcionales
 
-Prioridad: **A** = imprescindible (la instructora lo pidió expresamente), **M** = importante, **B** = deseable o deducido.
+Cada requisito tiene **ID**, **nombre**, **descripción**, **prioridad** (Alta = lo pidió la instructora, Media = importante, Baja = deseable o deducido) y sus **controles y restricciones**.
+
+> **Nota:** los controles y restricciones son una propuesta hecha a partir del análisis de la clase; hay que validarlos con la instructora.
 
 ### 4.1 Gestión de eventos y tipologías
-| ID | Requisito | Prioridad |
-|---|---|---|
-| RF-01 | Crear, editar, consultar y archivar eventos con nombre, fecha, hora, lugar, motivo y estado (fase actual). | A |
-| RF-02 | Clasificar el evento por **tipología**. Los eventos sociales (cumpleaños, primera comunión, etc.) no aplican; el enfoque son los **eventos corporativos o institucionales**: lanzamiento de marca, conferencia, seminario, taller, workshop, road show, congreso, convención, charla, conversatorio, feria, etc. (más de 20 tipos). El catálogo debe ser administrable. | A |
-| RF-03 | Registrar el **objetivo** del evento ("¿qué tengo que lograr?"), sus **características** y el **público objetivo**. | A |
-| RF-04 | **Historial de eventos:** consultar cómo se hizo un evento en años anteriores (p. ej., "Día del Campesino 2025") y **duplicarlo como plantilla** para la siguiente edición. | A |
-| RF-05 | Ver el avance del evento por fase (tablero de seguimiento y control). | M |
+
+| ID | NOMBRE | DESCRIPCIÓN | PRIORIDAD |
+|---|---|---|---|
+| **RF-01** | **REGISTRO DE EVENTOS** | El sistema deberá permitir crear, editar, consultar y archivar eventos institucionales registrando nombre, fecha, hora de inicio y de fin, lugar, motivo, responsable y estado del evento según la fase en que se encuentre (planificación, programación, ejecución o evaluación). Al guardar, el sistema deberá mostrar el evento en el listado general con su fase actual. | Alta |
+| | *CONTROLES Y RESTRICCIONES* | • El sistema restringirá el guardado del evento mientras no se hayan diligenciado el nombre, la fecha, el lugar y el responsable.<br>• El sistema impedirá registrar una fecha u hora de fin anterior a la de inicio.<br>• El sistema únicamente permitirá archivar un evento cuando haya terminado su fase de evaluación. | |
+| **RF-02** | **TIPOLOGÍA DEL EVENTO** | El sistema deberá permitir clasificar cada evento según su tipología, a partir de un catálogo administrable de eventos corporativos e institucionales (lanzamiento de marca, conferencia, seminario, taller, workshop, road show, congreso, convención, charla, conversatorio, feria, entre otros). El administrador podrá agregar, modificar o desactivar tipologías del catálogo. | Alta |
+| | *CONTROLES Y RESTRICCIONES* | • El sistema únicamente permitirá seleccionar tipologías activas del catálogo.<br>• El sistema no permitirá registrar eventos de tipo social (cumpleaños, primera comunión u otros), porque no forman parte del alcance institucional.<br>• El sistema impedirá eliminar una tipología asociada a eventos registrados; solo permitirá desactivarla. | |
+| **RF-03** | **OBJETIVO Y PÚBLICO DEL EVENTO** | El sistema deberá permitir registrar el objetivo del evento (lo que se espera lograr con él), sus características principales y el público objetivo al que va dirigido, como parte de la definición del evento en la fase de planificación. | Alta |
+| | *CONTROLES Y RESTRICCIONES* | • El sistema restringirá el paso a la fase de programación mientras no se hayan registrado el objetivo y el público objetivo. | |
+| **RF-04** | **HISTORIAL Y PLANTILLAS DE EVENTOS** | El sistema deberá permitir consultar los eventos realizados en años anteriores con toda su información (comités, plan de acción, programa, proveedores, asistencia, evaluación e informes) y duplicar un evento anterior como plantilla para organizar una nueva edición. | Alta |
+| | *CONTROLES Y RESTRICCIONES* | • El sistema únicamente permitirá duplicar eventos finalizados o archivados.<br>• Al duplicar un evento, el sistema no copiará la asistencia, las evaluaciones ni los certificados del evento original. | |
+| **RF-05** | **TABLERO DE SEGUIMIENTO** | El sistema deberá mostrar un tablero de seguimiento y control con el avance de cada evento por fase, indicando las tareas pendientes, en curso y terminadas, y sus responsables. | Media |
+| | *CONTROLES Y RESTRICCIONES* | • El sistema únicamente mostrará a cada usuario los eventos en los que participa, salvo al administrador, que verá todos. | |
 
 ### 4.2 Planificación
-| ID | Requisito | Prioridad |
-|---|---|---|
-| RF-06 | **Comités del evento:** crear comités (la instructora menciona seis: logística, comunicaciones, académico, decoración y otros dos que no se entienden en el audio) con sus **funciones**. | A |
-| RF-07 | **Plan de acción:** cada función genera **tareas**, cada tarea cumple un **objetivo** y tiene un **responsable**. | A |
-| RF-08 | **Cronograma de actividades** generado a partir del plan de acción (fechas, responsables, estado). Ejemplo: comité académico → buscar posibles conferencistas → contactarlos → enviar la invitación. | A |
-| RF-09 | **Presupuesto inicial** del evento que se pueda ajustar a medida que aparecen requerimientos (presupuesto inicial frente al ejecutado). | A |
-| RF-10 | **Panorama de riesgos:** identificar riesgos (p. ej., inundación por lluvia en el Día del Campesino), su **nivel**, las medidas y un plan alternativo, con base en una **lista de chequeo** (enfoque de seguridad y salud en el trabajo). | A |
-| RF-11 | **Conferencistas o invitados especiales:** datos de contacto, lugar de residencia, ocupación, hoja de vida, requisito académico o experiencial y **condiciones o contrapartidas** que piden (transporte, hospedaje, honorarios, alimentación). | A |
-| RF-12 | Adjuntar el **rider técnico** de artistas o conferencistas (requerimientos técnicos). | M |
+
+| ID | NOMBRE | DESCRIPCIÓN | PRIORIDAD |
+|---|---|---|---|
+| **RF-06** | **COMITÉS DEL EVENTO** | El sistema deberá permitir crear los comités de cada evento (logística, comunicaciones, académico, decoración, entre otros), definir sus funciones y asignar sus integrantes y su líder. | Alta |
+| | *CONTROLES Y RESTRICCIONES* | • El sistema restringirá la creación de un comité mientras no tenga nombre y líder asignado.<br>• El sistema impedirá asignar como integrante a una persona que no esté registrada como usuario. | |
+| **RF-07** | **PLAN DE ACCIÓN** | El sistema deberá permitir construir el plan de acción del evento a partir de las funciones de cada comité: cada función genera tareas, y cada tarea cumple un objetivo y tiene un responsable y una fecha límite. | Alta |
+| | *CONTROLES Y RESTRICCIONES* | • El sistema no permitirá guardar una tarea sin responsable ni fecha límite.<br>• El sistema únicamente permitirá al líder del comité y al administrador modificar las tareas de ese comité. | |
+| **RF-08** | **CRONOGRAMA DE ACTIVIDADES** | El sistema deberá generar el cronograma de actividades a partir del plan de acción, mostrando las tareas ordenadas por fecha con su responsable y estado (pendiente, en curso o terminada). Por ejemplo: comité académico → buscar conferencistas → contactarlos → enviar la invitación. | Alta |
+| | *CONTROLES Y RESTRICCIONES* | • El sistema resaltará las tareas vencidas que no se hayan marcado como terminadas.<br>• El sistema impedirá marcar como terminada una tarea que dependa de otra que todavía esté pendiente. | |
+| **RF-09** | **PRESUPUESTO DEL EVENTO** | El sistema deberá permitir registrar el presupuesto inicial del evento por rubros y ajustarlo a medida que aparezcan nuevos requerimientos, comparando el valor presupuestado con el valor ejecutado. | Alta |
+| | *CONTROLES Y RESTRICCIONES* | • El sistema únicamente aceptará valores numéricos positivos en los rubros.<br>• El sistema conservará el presupuesto inicial aunque se registren ajustes posteriores.<br>• El sistema avisará cuando el valor ejecutado supere el valor presupuestado. | |
+| **RF-10** | **PANORAMA DE RIESGOS** | El sistema deberá permitir identificar los riesgos de cada evento con su nivel (bajo, medio o alto), las medidas de prevención y el plan alternativo, apoyándose en una lista de chequeo de seguridad y salud en el trabajo. Por ejemplo, el riesgo de inundación por lluvia en el Día del Campesino. | Alta |
+| | *CONTROLES Y RESTRICCIONES* | • El sistema no permitirá registrar un riesgo de nivel alto sin medida de prevención y plan alternativo.<br>• El sistema restringirá el paso a la fase de ejecución mientras la lista de chequeo de riesgos no esté diligenciada. | |
+| **RF-11** | **CONFERENCISTAS E INVITADOS ESPECIALES** | El sistema deberá permitir registrar a los conferencistas e invitados especiales con sus datos de contacto, lugar de residencia, ocupación, hoja de vida y las condiciones que solicitan para participar (transporte, hospedaje, honorarios o alimentación). | Alta |
+| | *CONTROLES Y RESTRICCIONES* | • El sistema restringirá el envío de la invitación mientras no se hayan registrado las condiciones del invitado.<br>• El sistema únicamente permitirá adjuntar la hoja de vida en formato PDF. | |
+| **RF-12** | **RIDER TÉCNICO** | El sistema deberá permitir adjuntar el rider técnico de artistas o conferencistas y asociar sus requerimientos técnicos (sonido, luces, tarima, ubicación) a los requerimientos del evento. | Media |
+| | *CONTROLES Y RESTRICCIONES* | • El sistema únicamente aceptará archivos PDF o de imagen dentro del tamaño máximo definido. | |
 
 ### 4.3 Programación
-| ID | Requisito | Prioridad |
-|---|---|---|
-| RF-13 | Registrar **requerimientos** del evento clasificados en **técnicos, de personal y financieros** (p. ej., una mesa, un mantel blanco con el logo del SENA, sillas, computadores o tabletas, micrófonos, parlantes, refrigerio, material impreso). | A |
-| RF-14 | **Banco de proveedores:** proveedor, servicio, lo que incluye (p. ej., "sonido con 2 micrófonos y 3 parlantes"), costo, contacto e historial de eventos en que participó. Reutilizable entre eventos. | A |
-| RF-15 | **Agenda:** las grandes partes del evento (inicio y protocolo, desarrollo, cierre y evaluación). | A |
-| RF-16 | **Programa:** el detalle de cada parte, con duración. P. ej., registro, acto protocolario, oración, palabras de bienvenida, himno nacional e himno del SENA, palabras del subdirector y de los coordinadores, charla, refrigerio y punto de hidratación o café, cierre. | A |
-| RF-17 | **Libreto del presentador** generado a partir del programa y de la definición del evento (por qué, para qué, objetivos). La instructora menciona que hoy usan **inteligencia artificial** para redactarlo. Debe poder editarse a mano. | M |
-| RF-18 | **Minuto a minuto:** cada acción operativa con hora, duración, responsable y recursos (p. ej., "instalar la mesa de registro debajo del palo de mango: 20 min, responsable X, recursos: mesa, mantel, 3 sillas, celulares con QR"). Incluye el pre-evento (día anterior), el día del evento y el post-evento. | A |
-| RF-19 | **Solicitudes internas de recursos** (mesas, sillas, maquinaria, espacios) al administrador del centro, con **plantilla de correo** reutilizable, porque hoy "todas las veces hay que redactar el mismo correo". | M |
-| RF-20 | **Inventario de recursos del centro** y su ubicación (p. ej., las 26 mesas naranjas repartidas por el centro). | B (¿?) |
+
+| ID | NOMBRE | DESCRIPCIÓN | PRIORIDAD |
+|---|---|---|---|
+| **RF-13** | **REQUERIMIENTOS DEL EVENTO** | El sistema deberá permitir registrar los requerimientos del evento clasificados en técnicos, de personal y financieros (mesas, manteles con el logo del SENA, sillas, computadores o tabletas, micrófonos, parlantes, refrigerios, material impreso), indicando la cantidad, el responsable y si se obtienen del centro o de un proveedor. | Alta |
+| | *CONTROLES Y RESTRICCIONES* | • El sistema no permitirá guardar un requerimiento sin tipo, cantidad y responsable.<br>• El sistema sumará al presupuesto del evento los requerimientos que tengan costo. | |
+| **RF-14** | **BANCO DE PROVEEDORES** | El sistema deberá contar con un banco de proveedores reutilizable entre eventos que registre el servicio que ofrece cada proveedor y lo que incluye (por ejemplo, sonido con 2 micrófonos y 3 parlantes), su costo, sus datos de contacto y los eventos en los que ha participado. | Alta |
+| | *CONTROLES Y RESTRICCIONES* | • El sistema impedirá registrar dos proveedores con el mismo NIT o número de documento.<br>• El sistema únicamente permitirá al administrador eliminar proveedores. | |
+| **RF-15** | **AGENDA DEL EVENTO** | El sistema deberá permitir definir la agenda del evento con sus grandes partes: inicio y protocolo, desarrollo, y cierre y evaluación. | Alta |
+| | *CONTROLES Y RESTRICCIONES* | • El sistema restringirá la creación del programa mientras no exista la agenda. | |
+| **RF-16** | **PROGRAMA DEL EVENTO** | El sistema deberá permitir detallar cada parte de la agenda en un programa con la hora y la duración de cada punto: registro, acto protocolario, oración, palabras de bienvenida, himno nacional e himno del SENA, palabras del subdirector y de los coordinadores, charlas, refrigerio y cierre. | Alta |
+| | *CONTROLES Y RESTRICCIONES* | • El sistema impedirá que dos puntos del programa se crucen en el mismo horario.<br>• El sistema avisará cuando la duración total del programa supere el horario del evento. | |
+| **RF-17** | **LIBRETO DEL PRESENTADOR** | El sistema deberá generar el libreto del presentador a partir del programa y de la definición del evento (por qué se hace, para qué y cuáles son sus objetivos), con la opción de apoyarse en inteligencia artificial para redactarlo, y permitir editarlo manualmente antes de descargarlo. | Media |
+| | *CONTROLES Y RESTRICCIONES* | • El sistema únicamente generará el libreto cuando el programa esté completo.<br>• El sistema requerirá la revisión del coordinador antes de marcar el libreto como definitivo. | |
+| **RF-18** | **MINUTO A MINUTO** | El sistema deberá permitir elaborar el minuto a minuto del evento con cada acción operativa, su hora, duración, responsable y recursos, desde el día anterior (pre-evento) hasta después del evento. Por ejemplo: instalar la mesa de registro debajo del palo de mango, 20 minutos, con mesa, mantel, 3 sillas y celulares con el código QR. | Alta |
+| | *CONTROLES Y RESTRICCIONES* | • El sistema no permitirá guardar una acción sin hora y responsable.<br>• El sistema avisará cuando un mismo responsable tenga dos acciones a la misma hora. | |
+| **RF-19** | **SOLICITUD INTERNA DE RECURSOS** | El sistema deberá permitir generar solicitudes de recursos internos (mesas, sillas, maquinaria, espacios) dirigidas al administrador del centro, a partir de una plantilla de correo reutilizable que se completa con los datos del evento. | Media |
+| | *CONTROLES Y RESTRICCIONES* | • El sistema restringirá el envío de la solicitud mientras no se indiquen el recurso, la cantidad, la fecha y el lugar. | |
+| **RF-20** | **INVENTARIO DE RECURSOS DEL CENTRO** | El sistema deberá permitir registrar el inventario de recursos del centro de formación y su ubicación (por ejemplo, las 26 mesas naranjas repartidas por distintas áreas), para saber qué hay disponible al planear un evento. **(por confirmar)** | Baja |
+| | *CONTROLES Y RESTRICCIONES* | • El sistema impedirá asignar a un evento más unidades de un recurso de las que hay disponibles en el inventario. | |
 
 ### 4.4 Ejecución
-| ID | Requisito | Prioridad |
-|---|---|---|
-| RF-21 | **Registro de asistencia con código QR** desde celulares, tabletas o computadores en la mesa de registro. | A |
-| RF-22 | **Evidencias de ejecución:** subir fotos, listas, documentos y videos asociados al evento o a una actividad. | A |
-| RF-23 | Checklist de **montaje y desmontaje**. | M |
-| RF-24 | Marcar actividades del minuto a minuto como realizadas o con novedad durante el evento (control en tiempo real). | B |
+
+| ID | NOMBRE | DESCRIPCIÓN | PRIORIDAD |
+|---|---|---|---|
+| **RF-21** | **REGISTRO DE ASISTENCIA CON QR** | El sistema deberá generar un código QR por evento que permita a los asistentes registrar su asistencia desde celulares, tabletas o computadores ingresando su nombre y número de documento. | Alta |
+| | *CONTROLES Y RESTRICCIONES* | • El sistema restringirá el envío del registro mientras no se hayan diligenciado el nombre y el número de documento.<br>• El sistema impedirá registrar dos veces la asistencia del mismo documento en el mismo evento.<br>• El sistema únicamente aceptará registros dentro del horario del evento. | |
+| **RF-22** | **EVIDENCIAS DE EJECUCIÓN** | El sistema deberá permitir subir evidencias de la ejecución del evento (fotografías, listas, documentos y videos) asociadas al evento o a una actividad del minuto a minuto. | Alta |
+| | *CONTROLES Y RESTRICCIONES* | • El sistema únicamente aceptará archivos de imagen, PDF o video dentro del tamaño máximo definido.<br>• El sistema registrará quién subió cada evidencia y en qué fecha. | |
+| **RF-23** | **MONTAJE Y DESMONTAJE** | El sistema deberá permitir llevar una lista de chequeo del montaje y desmontaje del evento, marcando cada elemento como instalado o retirado. | Media |
+| | *CONTROLES Y RESTRICCIONES* | • El sistema restringirá el cierre del evento mientras haya elementos del desmontaje sin marcar. | |
+| **RF-24** | **CONTROL EN TIEMPO REAL** | El sistema deberá permitir marcar durante el evento cada actividad del minuto a minuto como realizada o con novedad, registrando una observación cuando haya novedad. | Baja |
+| | *CONTROLES Y RESTRICCIONES* | • El sistema no permitirá marcar una actividad con novedad sin escribir la observación. | |
 
 ### 4.5 Evaluación y cierre
-| ID | Requisito | Prioridad |
-|---|---|---|
-| RF-25 | **Encuesta de satisfacción por QR** generada automáticamente para cada evento a partir de un **banco de preguntas** reutilizable (escala de 1 a 5 y comentarios; p. ej., "¿el evento empezó a tiempo?", "¿las sillas eran cómodas?"), sin tener que crear un formulario nuevo cada vez. | A |
-| RF-26 | **Informe de evaluación** automático con los resultados de la encuesta. | A |
-| RF-27 | **Evaluación administrativa** interna: cómo vivió el equipo organizador la ejecución, qué funcionó y qué no (lecciones aprendidas para la próxima edición). | A |
-| RF-28 | **Certificados o constancias de asistencia:** cargar un **Excel** con nombres, documentos de identidad, fecha y duración, aplicar una **plantilla de diseño** y generar los certificados automáticamente. | A |
-| RF-29 | **Envío masivo por correo** a los asistentes y **descarga del certificado desde la plataforma** (p. ej., buscando por número de documento). | A |
-| RF-30 | **Memorias del evento** (presentaciones, fotos, conclusiones) descargables. | M |
-| RF-31 | **Informe final de ejecución** con todo lo que pasó en el evento (presupuesto, asistencia, evaluación, evidencias, novedades). | A |
 
-### 4.6 Banco de datos histórico (transversal)
-| ID | Requisito | Prioridad |
-|---|---|---|
-| RF-32 | **Directorio de contactos** reutilizable: asistentes, invitados (p. ej., campesinos del Día del Campesino), **evaluadores**, conferencistas, proveedores y aliados (colegios, universidades). | A |
-| RF-33 | Volver a invitar fácilmente a los contactos de una edición anterior (p. ej., a los 22 evaluadores de la feria, para buscar solo a los 5 que no puedan y no a los 22). | A |
-| RF-34 | **Ferias de proyectos:** inscripción de proyectos y **asignación de evaluadores** según el número de proyectos inscritos (p. ej., 75 proyectos entre 22 evaluadores, de 7 a 10 proyectos cada uno, en unas 2 horas). | M (¿?) |
-| RF-35 | Búsqueda y filtros en el histórico por tipo de evento, año, lugar y responsable. | M |
+| ID | NOMBRE | DESCRIPCIÓN | PRIORIDAD |
+|---|---|---|---|
+| **RF-25** | **ENCUESTA DE SATISFACCIÓN CON QR** | El sistema deberá generar automáticamente, para cada evento, una encuesta de satisfacción accesible por código QR a partir de un banco de preguntas reutilizable, con escala de 1 a 5 y un espacio para comentarios, sin necesidad de crear un formulario nuevo cada vez. | Alta |
+| | *CONTROLES Y RESTRICCIONES* | • El sistema permitirá responder la encuesta una sola vez por asistente.<br>• El sistema únicamente habilitará la encuesta desde el cierre del evento hasta el plazo definido por el organizador. | |
+| **RF-26** | **INFORME DE EVALUACIÓN** | El sistema deberá generar automáticamente el informe de evaluación del evento con los resultados de la encuesta (promedio por pregunta, número de respuestas y comentarios), descargable en PDF. | Alta |
+| | *CONTROLES Y RESTRICCIONES* | • El sistema únicamente generará el informe cuando la encuesta esté cerrada. | |
+| **RF-27** | **EVALUACIÓN ADMINISTRATIVA** | El sistema deberá permitir al equipo organizador registrar la evaluación administrativa del evento: qué funcionó, qué no funcionó y las lecciones aprendidas para la siguiente edición. | Alta |
+| | *CONTROLES Y RESTRICCIONES* | • El sistema únicamente permitirá diligenciarla a los integrantes de los comités del evento. | |
+| **RF-28** | **GENERACIÓN DE CERTIFICADOS** | El sistema deberá generar automáticamente certificados o constancias de asistencia a partir de un archivo de Excel con los nombres, números de documento, fecha y duración del evento, aplicando una plantilla de diseño institucional. | Alta |
+| | *CONTROLES Y RESTRICCIONES* | • El sistema validará que el archivo de Excel tenga las columnas requeridas antes de generar los certificados e informará las filas con errores.<br>• El sistema únicamente generará certificados para quienes tengan asistencia registrada, salvo que el organizador indique lo contrario. | |
+| **RF-29** | **ENVÍO Y DESCARGA DE CERTIFICADOS** | El sistema deberá enviar los certificados por correo electrónico masivo a los asistentes y permitir que cada asistente descargue su certificado desde la plataforma ingresando su número de documento. | Alta |
+| | *CONTROLES Y RESTRICCIONES* | • El sistema únicamente mostrará a cada persona el certificado que corresponde a su número de documento.<br>• El sistema registrará los correos que no se pudieron entregar. | |
+| **RF-30** | **MEMORIAS DEL EVENTO** | El sistema deberá permitir publicar las memorias del evento (presentaciones, fotografías y conclusiones) para que los asistentes las descarguen. | Media |
+| | *CONTROLES Y RESTRICCIONES* | • El sistema únicamente publicará las memorias aprobadas por el coordinador del evento. | |
+| **RF-31** | **INFORME FINAL DE EJECUCIÓN** | El sistema deberá generar el informe final de ejecución del evento con el presupuesto ejecutado, la asistencia, los resultados de la evaluación, las evidencias y las novedades, descargable en PDF. | Alta |
+| | *CONTROLES Y RESTRICCIONES* | • El sistema restringirá el archivo del evento mientras no se haya generado el informe final. | |
 
+### 4.6 Banco de datos histórico
+
+| ID | NOMBRE | DESCRIPCIÓN | PRIORIDAD |
+|---|---|---|---|
+| **RF-32** | **DIRECTORIO DE CONTACTOS** | El sistema deberá contar con un directorio de contactos reutilizable con asistentes, invitados (por ejemplo, los campesinos del Día del Campesino), evaluadores, conferencistas, proveedores y aliados (colegios y universidades), indicando en qué eventos ha participado cada uno. | Alta |
+| | *CONTROLES Y RESTRICCIONES* | • El sistema impedirá registrar dos contactos con el mismo número de documento.<br>• El sistema solicitará la autorización de tratamiento de datos personales antes de guardar un contacto. | |
+| **RF-33** | **INVITACIÓN A CONTACTOS ANTERIORES** | El sistema deberá permitir seleccionar contactos de una edición anterior de un evento y enviarles la invitación a la nueva edición (por ejemplo, volver a invitar a los 22 evaluadores de la feria), registrando quién acepta y quién no. | Alta |
+| | *CONTROLES Y RESTRICCIONES* | • El sistema no enviará invitaciones a los contactos que hayan pedido no ser contactados. | |
+| **RF-34** | **FERIAS DE PROYECTOS** | El sistema deberá permitir la inscripción de proyectos en ferias y la asignación de evaluadores según el número de proyectos inscritos (por ejemplo, 75 proyectos, de 7 a 10 por evaluador, en unas 2 horas). **(por confirmar)** | Media |
+| | *CONTROLES Y RESTRICCIONES* | • El sistema impedirá asignar a un evaluador más proyectos que el máximo definido.<br>• El sistema impedirá que un evaluador califique un proyecto en el que participa. | |
+| **RF-35** | **BÚSQUEDA EN EL HISTÓRICO** | El sistema deberá permitir buscar y filtrar el histórico de eventos por tipología, año, lugar y responsable. | Media |
+| | *CONTROLES Y RESTRICCIONES* | • El sistema únicamente mostrará los resultados a los que el usuario tenga permiso de acceso. | |
 ### 4.7 Usuarios y roles (deducido)
 | Rol | Qué hace |
 |---|---|
@@ -143,16 +185,24 @@ Prioridad: **A** = imprescindible (la instructora lo pidió expresamente), **M**
 
 ## 5. Requisitos no funcionales
 
-| ID | Requisito |
-|---|---|
-| RNF-01 | **Plataforma web responsive**: el registro por QR y las encuestas se usan desde el celular. |
-| RNF-02 | Fácil de usar para personas sin perfil técnico (instructores y aprendices de cualquier programa). |
-| RNF-03 | **Persistencia y continuidad:** la información no puede depender de una persona; debe tener copias de seguridad. |
-| RNF-04 | **Protección de datos personales** (Ley 1581 de 2012, Habeas Data): se guardan documentos de identidad, teléfonos y correos. *(Añadido por el análisis: la instructora no lo mencionó.)* |
-| RNF-05 | Generación de documentos descargables (PDF, Excel) para el programa, el minuto a minuto, los informes y los certificados. |
-| RNF-06 | Alineación con **ISO 9001:2015** (control de documentos y registros, mejora continua) y con la imagen institucional del SENA. |
-| RNF-07 | Control de acceso por roles. |
-| RNF-08 | Documentación del proyecto suficiente para que otros aprendices puedan continuarlo (póster: "documentar el proyecto para darle continuidad"). |
+| ID | NOMBRE | DESCRIPCIÓN | PRIORIDAD |
+|---|---|---|---|
+| **RNF-01** | **DISEÑO ADAPTABLE** | El sistema deberá adaptarse a pantallas de celulares, tabletas y computadores, porque el registro de asistencia por QR y las encuestas se usan desde el teléfono. | Alta |
+| | *CONTROLES Y RESTRICCIONES* | • Todas las funciones deberán poder usarse en pantallas desde 360 px de ancho sin desplazamiento horizontal. | |
+| **RNF-02** | **USABILIDAD** | El sistema deberá ser fácil de usar para personas sin perfil técnico (instructores y aprendices de cualquier programa), con textos en español claro y ayudas en cada formulario. | Alta |
+| | *CONTROLES Y RESTRICCIONES* | • Las tareas principales (crear un evento, registrar asistencia, generar certificados) deberán poder completarse en pocos pasos y sin capacitación previa. | |
+| **RNF-03** | **CONTINUIDAD Y RESPALDO** | El sistema deberá conservar la información de los eventos aunque cambien las personas que los organizan, con copias de seguridad periódicas. | Alta |
+| | *CONTROLES Y RESTRICCIONES* | • Se realizará una copia de seguridad automática al menos una vez por semana.<br>• Ningún usuario podrá borrar definitivamente un evento archivado. | |
+| **RNF-04** | **PROTECCIÓN DE DATOS PERSONALES** | El sistema deberá cumplir la Ley 1581 de 2012 (Habeas Data), porque guarda documentos de identidad, teléfonos y correos. Requisito añadido en el análisis; la instructora no lo mencionó. | Alta |
+| | *CONTROLES Y RESTRICCIONES* | • El sistema solicitará la aceptación de la política de tratamiento de datos antes de registrar datos personales.<br>• Los números de documento solo serán visibles para los usuarios con rol de organizador o administrador. | |
+| **RNF-05** | **DOCUMENTOS DESCARGABLES** | El sistema deberá permitir descargar en PDF y Excel el programa, el minuto a minuto, los informes y los certificados. | Media |
+| | *CONTROLES Y RESTRICCIONES* | • Los documentos generados incluirán el logo del SENA y la fecha de generación. | |
+| **RNF-06** | **CALIDAD E IMAGEN INSTITUCIONAL** | El sistema deberá alinearse con la norma ISO 9001:2015 (control de documentos y registros, mejora continua) y con el manual de imagen institucional del SENA. | Media |
+| | *CONTROLES Y RESTRICCIONES* | • Todo documento generado tendrá código, versión y fecha. | |
+| **RNF-07** | **SEGURIDAD Y CONTROL DE ACCESO** | El sistema deberá controlar el acceso por roles (administrador, líder de comité, integrante, presentador, asistente y directivo), mostrando a cada usuario solo las funciones que le corresponden. | Alta |
+| | *CONTROLES Y RESTRICCIONES* | • Las contraseñas se guardarán cifradas.<br>• La sesión se cerrará automáticamente tras un tiempo de inactividad. | |
+| **RNF-08** | **DOCUMENTACIÓN Y MANTENIBILIDAD** | El sistema deberá contar con documentación técnica y manual de usuario suficientes para que otros aprendices puedan continuar el proyecto. | Media |
+| | *CONTROLES Y RESTRICCIONES* | • El código fuente estará en un repositorio con instrucciones de instalación. | |
 
 ---
 

@@ -17,6 +17,7 @@ create table if not exists public.entradas (
 );
 
 -- Cambios en los requisitos (editar, agregar, eliminar, recuperar, volver al original).
+-- titulo = NOMBRE del requisito, texto = DESCRIPCIÓN, controles = CONTROLES Y RESTRICCIONES (uno por línea).
 -- Cada cambio es una fila nueva: nunca se sobrescribe nada, así queda el historial.
 alter table public.entradas add column if not exists req       text check (char_length(req) <= 80);
 alter table public.entradas add column if not exists accion    text check (accion in ('agregar', 'editar', 'eliminar', 'recuperar', 'original'));
@@ -24,6 +25,8 @@ alter table public.entradas add column if not exists rid       text check (char_
 alter table public.entradas add column if not exists grupo     text check (char_length(grupo) <= 80);
 alter table public.entradas add column if not exists prioridad text check (prioridad in ('A', 'M', 'B'));
 alter table public.entradas add column if not exists dudoso    int  not null default 0 check (dudoso in (0, 1));
+alter table public.entradas add column if not exists titulo    text check (char_length(titulo) <= 150);
+alter table public.entradas add column if not exists controles text check (char_length(controles) <= 4000);
 
 alter table public.entradas drop constraint if exists entradas_tipo_check;
 alter table public.entradas add constraint entradas_tipo_check
@@ -35,10 +38,10 @@ alter table public.entradas enable row level security;
 
 revoke all on public.entradas from anon, authenticated;
 grant select (id, tipo, qid, texto, tema, seccion, ref, bloqueante, nombre, creado,
-              req, accion, rid, grupo, prioridad, dudoso)
+              req, accion, rid, grupo, prioridad, dudoso, titulo, controles)
   on public.entradas to anon, authenticated;
 grant insert (tipo, qid, texto, tema, seccion, ref, bloqueante, nombre, clave,
-              req, accion, rid, grupo, prioridad, dudoso)
+              req, accion, rid, grupo, prioridad, dudoso, titulo, controles)
   on public.entradas to anon, authenticated;
 
 drop policy if exists "leer" on public.entradas;

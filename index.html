@@ -146,20 +146,46 @@ textarea{resize:vertical;min-height:4.5rem}
 .msg.err{color:var(--pri-a)}
 body:not([data-mode="ok"]) .writeui{display:none}
 
-/* Requisitos editables */
-td.rtxt{min-width:0}
-.rmeta{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem;margin-top:.35rem;font-size:.82rem}
+/* Requisitos: ID · NOMBRE · DESCRIPCIÓN · PRIORIDAD + CONTROLES Y RESTRICCIONES */
+table.reqtbl{table-layout:fixed}
+.reqtbl col.c-id{width:4.8rem}.reqtbl col.c-nom{width:11.5rem}.reqtbl col.c-pri{width:6.5rem}
+.reqtbl th,.reqtbl td{border:1px solid var(--line)}
+.reqtbl tbody.req tr:last-child td{border-bottom:1px solid var(--line)}
+.reqtbl td.id{font-weight:600;color:var(--fg)}
+.r-nom{font-weight:700;font-size:.88rem;text-transform:uppercase;letter-spacing:.02em;overflow-wrap:anywhere}
+.r-desc,.r-ctl-list{min-width:0;overflow-wrap:anywhere}
+.r-ctl-label{font-size:.76rem;font-weight:700;letter-spacing:.05em;color:var(--muted);text-transform:uppercase}
+ul.ctl{margin:0;padding-left:1.1rem;display:flex;flex-direction:column;gap:.3rem}
+.reqtbl td.pri{text-align:center}
+.rmeta{display:flex;flex-wrap:wrap;align-items:center;gap:.45rem;margin-top:.45rem;font-size:.84rem}
+.ract{display:inline-flex;flex-wrap:wrap;align-items:center;gap:.75rem}
+.ract .link{font-size:.84rem}
 .chip.edit-chip{background:var(--pri-b-soft);color:var(--pri-b)}
 .chip.del-chip{background:var(--sunk);color:var(--muted);border:1px solid var(--line)}
-tr.deleted td{color:var(--muted)}
-tr.deleted .rbody{text-decoration:line-through}
-details.rhist{margin-top:.35rem}
+tbody.deleted td{color:var(--muted);background:var(--sunk)}
+tbody.deleted .rbody,tbody.deleted .r-nom,tbody.deleted ul.ctl{text-decoration:line-through}
+details.rhist{margin-top:.4rem}
 details.rhist>summary{cursor:pointer;color:var(--muted);font-size:.82rem}
 details.rhist .entries{margin-top:.4rem}
 tr.edit-row>td{background:var(--accent-soft)}
 .req-editor{margin:0}
 .re-title{font-family:var(--font-display);font-weight:700}
 .add-req{align-self:flex-start}
+@media (max-width:640px){
+  .reqtbl colgroup,.reqtbl thead{display:none}
+  .reqtbl,.reqtbl tbody,.reqtbl tr,.reqtbl td{display:block;width:100%}
+  .reqtbl tbody.req{border-bottom:2px solid var(--line);padding-block:var(--s3)}
+  .reqtbl tbody.req:last-child{border-bottom:0}
+  .reqtbl td{border:0!important;padding:.2rem var(--s3)}
+  .reqtbl tr.r-main{display:flex;flex-wrap:wrap;align-items:center;gap:.25rem 0}
+  .reqtbl tr.r-main td.id{order:1;width:auto;font-family:var(--font-mono)}
+  .reqtbl tr.r-main td.pri{order:2;width:auto;margin-left:auto;text-align:right}
+  .reqtbl tr.r-main td.r-nom{order:3;font-size:.95rem}
+  .reqtbl tr.r-main td.r-desc{order:4}
+  .reqtbl tr.r-ctl{margin-top:.35rem}
+  .reqtbl tr.r-ctl td.r-ctl-label{padding-top:.4rem}
+  tr.edit-row>td{padding:var(--s2)!important}
+}
 
 /* Pasos y fuentes */
 ol.steps{margin:0;padding-left:1.3rem;display:flex;flex-direction:column;gap:var(--s2)}
@@ -234,18 +260,19 @@ footer{font-size:.9rem;color:var(--muted);border-top:1px solid var(--line);paddi
   <section id="funcionales">
     <span class="eyebrow" id="rf-count">35 requisitos</span>
     <h2>Requisitos funcionales</h2>
-    <p class="muted">Puedes <b>editar</b> cualquier requisito o <b>agregar</b> uno nuevo en cada grupo. Cada cambio queda guardado en su <b>historial</b> con el nombre de quien lo hizo, y siempre se puede volver al texto original.</p>
+    <p class="muted">Cada requisito tiene <b>ID</b>, <b>nombre</b>, <b>descripción</b>, <b>prioridad</b> y sus <b>controles y restricciones</b>. Puedes <b>editar</b>, <b>eliminar</b> o <b>agregar</b> requisitos en cada grupo; cada cambio queda en su <b>historial</b> con el nombre de quien lo hizo, y lo eliminado se puede recuperar.</p>
+    <p class="note">Los controles y restricciones son una propuesta hecha a partir del análisis de la clase: hay que validarlos con la instructora.</p>
     <div class="legend">
-      <span><span class="chip A">Imprescindible</span> lo pidió la instructora</span>
-      <span><span class="chip M">Importante</span></span>
-      <span><span class="chip B">Deseable</span> o deducido</span>
+      <span><span class="chip A">Alta</span> lo pidió la instructora</span>
+      <span><span class="chip M">Media</span> importante</span>
+      <span><span class="chip B">Baja</span> deseable o deducido</span>
     </div>
     <div class="filters" role="group" aria-label="Filtrar por prioridad">
       <span>Mostrar:</span>
       <button type="button" id="f-all" data-f="all" aria-pressed="true">Todos</button>
-      <button type="button" id="f-A" data-f="A" aria-pressed="false">Imprescindibles</button>
-      <button type="button" id="f-M" data-f="M" aria-pressed="false">Importantes</button>
-      <button type="button" id="f-B" data-f="B" aria-pressed="false">Deseables</button>
+      <button type="button" id="f-A" data-f="A" aria-pressed="false">Alta</button>
+      <button type="button" id="f-M" data-f="M" aria-pressed="false">Media</button>
+      <button type="button" id="f-B" data-f="B" aria-pressed="false">Baja</button>
     </div>
     <div id="rf" class="stack" style="gap:var(--s5)"></div>
     <p class="muted">¿Tienes una duda sobre un requisito y no quieres cambiarlo todavía? Déjala en <a href="#comentarios">Comentarios</a> indicando su ID.</p>
@@ -362,48 +389,109 @@ const PHASES=[
  {n:"Fase 3",t:"Ejecución",items:["Montaje y desmontaje","Desarrollo del evento","Registro de asistencia"],docs:"Lista de asistencia y evidencias de ejecución."},
  {n:"Fase 4",t:"Evaluación",items:["Evaluación de los asistentes","Evaluación administrativa","Memorias y certificados"],docs:"Informe de evaluación, certificados o constancias e informe final de ejecución."}
 ];
+// Requisito: [ID, NOMBRE, DESCRIPCIÓN, prioridad (A=Alta, M=Media, B=Baja), por confirmar (1/0), [controles y restricciones]]
 const RF=[
  {g:"Gestión de eventos y tipologías",r:[
-  ["RF-01","Crear, editar, consultar y archivar eventos con nombre, fecha, hora, lugar, motivo y estado (fase actual).","A"],
-  ["RF-02","Clasificar el evento por tipología. Los eventos sociales (cumpleaños, primera comunión) no aplican; el enfoque son los eventos corporativos o institucionales: lanzamiento de marca, conferencia, seminario, taller, workshop, road show, congreso, convención, charla, conversatorio, feria (más de 20 tipos). Catálogo administrable.","A"],
-  ["RF-03","Registrar el objetivo del evento (\"¿qué tengo que lograr?\"), sus características y el público objetivo.","A"],
-  ["RF-04","Historial de eventos: consultar cómo se hizo un evento en años anteriores y duplicarlo como plantilla para la siguiente edición.","A"],
-  ["RF-05","Ver el avance del evento por fase en un tablero de seguimiento y control.","M"]]},
+  ["RF-01","REGISTRO DE EVENTOS","El sistema deberá permitir crear, editar, consultar y archivar eventos institucionales registrando nombre, fecha, hora de inicio y de fin, lugar, motivo, responsable y estado del evento según la fase en que se encuentre (planificación, programación, ejecución o evaluación). Al guardar, el sistema deberá mostrar el evento en el listado general con su fase actual.","A",0,[
+   "El sistema restringirá el guardado del evento mientras no se hayan diligenciado el nombre, la fecha, el lugar y el responsable.",
+   "El sistema impedirá registrar una fecha u hora de fin anterior a la de inicio.",
+   "El sistema únicamente permitirá archivar un evento cuando haya terminado su fase de evaluación."]],
+  ["RF-02","TIPOLOGÍA DEL EVENTO","El sistema deberá permitir clasificar cada evento según su tipología, a partir de un catálogo administrable de eventos corporativos e institucionales (lanzamiento de marca, conferencia, seminario, taller, workshop, road show, congreso, convención, charla, conversatorio, feria, entre otros). El administrador podrá agregar, modificar o desactivar tipologías del catálogo.","A",0,[
+   "El sistema únicamente permitirá seleccionar tipologías activas del catálogo.",
+   "El sistema no permitirá registrar eventos de tipo social (cumpleaños, primera comunión u otros), porque no forman parte del alcance institucional.",
+   "El sistema impedirá eliminar una tipología asociada a eventos registrados; solo permitirá desactivarla."]],
+  ["RF-03","OBJETIVO Y PÚBLICO DEL EVENTO","El sistema deberá permitir registrar el objetivo del evento (lo que se espera lograr con él), sus características principales y el público objetivo al que va dirigido, como parte de la definición del evento en la fase de planificación.","A",0,[
+   "El sistema restringirá el paso a la fase de programación mientras no se hayan registrado el objetivo y el público objetivo."]],
+  ["RF-04","HISTORIAL Y PLANTILLAS DE EVENTOS","El sistema deberá permitir consultar los eventos realizados en años anteriores con toda su información (comités, plan de acción, programa, proveedores, asistencia, evaluación e informes) y duplicar un evento anterior como plantilla para organizar una nueva edición.","A",0,[
+   "El sistema únicamente permitirá duplicar eventos finalizados o archivados.",
+   "Al duplicar un evento, el sistema no copiará la asistencia, las evaluaciones ni los certificados del evento original."]],
+  ["RF-05","TABLERO DE SEGUIMIENTO","El sistema deberá mostrar un tablero de seguimiento y control con el avance de cada evento por fase, indicando las tareas pendientes, en curso y terminadas, y sus responsables.","M",0,[
+   "El sistema únicamente mostrará a cada usuario los eventos en los que participa, salvo al administrador, que verá todos."]]]},
  {g:"Planificación",r:[
-  ["RF-06","Comités del evento con sus funciones. La instructora menciona seis: logística, comunicaciones, académico, decoración y otros dos que no se entienden en el audio.","A"],
-  ["RF-07","Plan de acción: cada función genera tareas, cada tarea cumple un objetivo y tiene un responsable.","A"],
-  ["RF-08","Cronograma de actividades generado desde el plan de acción, con fechas, responsables y estado. Ejemplo: comité académico → buscar conferencistas → contactarlos → enviar la invitación.","A"],
-  ["RF-09","Presupuesto inicial ajustable a medida que aparecen requerimientos (inicial frente a ejecutado).","A"],
-  ["RF-10","Panorama de riesgos: riesgo, nivel, medidas y plan alternativo, con lista de chequeo de seguridad y salud en el trabajo. Ejemplo real: la inundación por lluvia en el Día del Campesino.","A"],
-  ["RF-11","Conferencistas e invitados especiales: contacto, residencia, ocupación, hoja de vida y condiciones que piden (transporte, hospedaje, honorarios, alimentación).","A"],
-  ["RF-12","Adjuntar el rider técnico de artistas o conferencistas.","M"]]},
+  ["RF-06","COMITÉS DEL EVENTO","El sistema deberá permitir crear los comités de cada evento (logística, comunicaciones, académico, decoración, entre otros), definir sus funciones y asignar sus integrantes y su líder.","A",0,[
+   "El sistema restringirá la creación de un comité mientras no tenga nombre y líder asignado.",
+   "El sistema impedirá asignar como integrante a una persona que no esté registrada como usuario."]],
+  ["RF-07","PLAN DE ACCIÓN","El sistema deberá permitir construir el plan de acción del evento a partir de las funciones de cada comité: cada función genera tareas, y cada tarea cumple un objetivo y tiene un responsable y una fecha límite.","A",0,[
+   "El sistema no permitirá guardar una tarea sin responsable ni fecha límite.",
+   "El sistema únicamente permitirá al líder del comité y al administrador modificar las tareas de ese comité."]],
+  ["RF-08","CRONOGRAMA DE ACTIVIDADES","El sistema deberá generar el cronograma de actividades a partir del plan de acción, mostrando las tareas ordenadas por fecha con su responsable y estado (pendiente, en curso o terminada). Por ejemplo: comité académico → buscar conferencistas → contactarlos → enviar la invitación.","A",0,[
+   "El sistema resaltará las tareas vencidas que no se hayan marcado como terminadas.",
+   "El sistema impedirá marcar como terminada una tarea que dependa de otra que todavía esté pendiente."]],
+  ["RF-09","PRESUPUESTO DEL EVENTO","El sistema deberá permitir registrar el presupuesto inicial del evento por rubros y ajustarlo a medida que aparezcan nuevos requerimientos, comparando el valor presupuestado con el valor ejecutado.","A",0,[
+   "El sistema únicamente aceptará valores numéricos positivos en los rubros.",
+   "El sistema conservará el presupuesto inicial aunque se registren ajustes posteriores.",
+   "El sistema avisará cuando el valor ejecutado supere el valor presupuestado."]],
+  ["RF-10","PANORAMA DE RIESGOS","El sistema deberá permitir identificar los riesgos de cada evento con su nivel (bajo, medio o alto), las medidas de prevención y el plan alternativo, apoyándose en una lista de chequeo de seguridad y salud en el trabajo. Por ejemplo, el riesgo de inundación por lluvia en el Día del Campesino.","A",0,[
+   "El sistema no permitirá registrar un riesgo de nivel alto sin medida de prevención y plan alternativo.",
+   "El sistema restringirá el paso a la fase de ejecución mientras la lista de chequeo de riesgos no esté diligenciada."]],
+  ["RF-11","CONFERENCISTAS E INVITADOS ESPECIALES","El sistema deberá permitir registrar a los conferencistas e invitados especiales con sus datos de contacto, lugar de residencia, ocupación, hoja de vida y las condiciones que solicitan para participar (transporte, hospedaje, honorarios o alimentación).","A",0,[
+   "El sistema restringirá el envío de la invitación mientras no se hayan registrado las condiciones del invitado.",
+   "El sistema únicamente permitirá adjuntar la hoja de vida en formato PDF."]],
+  ["RF-12","RIDER TÉCNICO","El sistema deberá permitir adjuntar el rider técnico de artistas o conferencistas y asociar sus requerimientos técnicos (sonido, luces, tarima, ubicación) a los requerimientos del evento.","M",0,[
+   "El sistema únicamente aceptará archivos PDF o de imagen dentro del tamaño máximo definido."]]]},
  {g:"Programación",r:[
-  ["RF-13","Requerimientos clasificados en técnicos, de personal y financieros: mesa, mantel blanco con el logo del SENA, sillas, computadores o tabletas, micrófonos, parlantes, refrigerio, material impreso.","A"],
-  ["RF-14","Banco de proveedores reutilizable: servicio, qué incluye (p. ej., sonido con 2 micrófonos y 3 parlantes), costo, contacto e historial.","A"],
-  ["RF-15","Agenda: las grandes partes del evento (inicio y protocolo, desarrollo, cierre y evaluación).","A"],
-  ["RF-16","Programa con duración de cada punto: registro, acto protocolario, oración, bienvenida, himno nacional e himno del SENA, palabras del subdirector y coordinadores, charla, refrigerio, cierre.","A"],
-  ["RF-17","Libreto del presentador generado desde el programa y la definición del evento (por qué, para qué, objetivos). Hoy lo redactan con inteligencia artificial; debe poder editarse a mano.","M"],
-  ["RF-18","Minuto a minuto: cada acción con hora, duración, responsable y recursos. Ejemplo: instalar la mesa de registro debajo del palo de mango, 20 minutos, con mesa, mantel, 3 sillas y celulares con el QR. Incluye el día anterior, el día del evento y el después.","A"],
-  ["RF-19","Solicitudes internas de recursos (mesas, sillas, maquinaria, espacios) al administrador del centro con plantilla de correo reutilizable.","M"],
-  ["RF-20","Inventario de recursos del centro y su ubicación (p. ej., las 26 mesas naranjas repartidas por el centro).","B",1]]},
+  ["RF-13","REQUERIMIENTOS DEL EVENTO","El sistema deberá permitir registrar los requerimientos del evento clasificados en técnicos, de personal y financieros (mesas, manteles con el logo del SENA, sillas, computadores o tabletas, micrófonos, parlantes, refrigerios, material impreso), indicando la cantidad, el responsable y si se obtienen del centro o de un proveedor.","A",0,[
+   "El sistema no permitirá guardar un requerimiento sin tipo, cantidad y responsable.",
+   "El sistema sumará al presupuesto del evento los requerimientos que tengan costo."]],
+  ["RF-14","BANCO DE PROVEEDORES","El sistema deberá contar con un banco de proveedores reutilizable entre eventos que registre el servicio que ofrece cada proveedor y lo que incluye (por ejemplo, sonido con 2 micrófonos y 3 parlantes), su costo, sus datos de contacto y los eventos en los que ha participado.","A",0,[
+   "El sistema impedirá registrar dos proveedores con el mismo NIT o número de documento.",
+   "El sistema únicamente permitirá al administrador eliminar proveedores."]],
+  ["RF-15","AGENDA DEL EVENTO","El sistema deberá permitir definir la agenda del evento con sus grandes partes: inicio y protocolo, desarrollo, y cierre y evaluación.","A",0,[
+   "El sistema restringirá la creación del programa mientras no exista la agenda."]],
+  ["RF-16","PROGRAMA DEL EVENTO","El sistema deberá permitir detallar cada parte de la agenda en un programa con la hora y la duración de cada punto: registro, acto protocolario, oración, palabras de bienvenida, himno nacional e himno del SENA, palabras del subdirector y de los coordinadores, charlas, refrigerio y cierre.","A",0,[
+   "El sistema impedirá que dos puntos del programa se crucen en el mismo horario.",
+   "El sistema avisará cuando la duración total del programa supere el horario del evento."]],
+  ["RF-17","LIBRETO DEL PRESENTADOR","El sistema deberá generar el libreto del presentador a partir del programa y de la definición del evento (por qué se hace, para qué y cuáles son sus objetivos), con la opción de apoyarse en inteligencia artificial para redactarlo, y permitir editarlo manualmente antes de descargarlo.","M",0,[
+   "El sistema únicamente generará el libreto cuando el programa esté completo.",
+   "El sistema requerirá la revisión del coordinador antes de marcar el libreto como definitivo."]],
+  ["RF-18","MINUTO A MINUTO","El sistema deberá permitir elaborar el minuto a minuto del evento con cada acción operativa, su hora, duración, responsable y recursos, desde el día anterior (pre-evento) hasta después del evento. Por ejemplo: instalar la mesa de registro debajo del palo de mango, 20 minutos, con mesa, mantel, 3 sillas y celulares con el código QR.","A",0,[
+   "El sistema no permitirá guardar una acción sin hora y responsable.",
+   "El sistema avisará cuando un mismo responsable tenga dos acciones a la misma hora."]],
+  ["RF-19","SOLICITUD INTERNA DE RECURSOS","El sistema deberá permitir generar solicitudes de recursos internos (mesas, sillas, maquinaria, espacios) dirigidas al administrador del centro, a partir de una plantilla de correo reutilizable que se completa con los datos del evento.","M",0,[
+   "El sistema restringirá el envío de la solicitud mientras no se indiquen el recurso, la cantidad, la fecha y el lugar."]],
+  ["RF-20","INVENTARIO DE RECURSOS DEL CENTRO","El sistema deberá permitir registrar el inventario de recursos del centro de formación y su ubicación (por ejemplo, las 26 mesas naranjas repartidas por distintas áreas), para saber qué hay disponible al planear un evento.","B",1,[
+   "El sistema impedirá asignar a un evento más unidades de un recurso de las que hay disponibles en el inventario."]]]},
  {g:"Ejecución",r:[
-  ["RF-21","Registro de asistencia con código QR desde celulares, tabletas o computadores.","A"],
-  ["RF-22","Evidencias de ejecución: fotos, listas, documentos y videos por evento o actividad.","A"],
-  ["RF-23","Lista de chequeo de montaje y desmontaje.","M"],
-  ["RF-24","Marcar actividades del minuto a minuto como hechas o con novedad durante el evento.","B"]]},
+  ["RF-21","REGISTRO DE ASISTENCIA CON QR","El sistema deberá generar un código QR por evento que permita a los asistentes registrar su asistencia desde celulares, tabletas o computadores ingresando su nombre y número de documento.","A",0,[
+   "El sistema restringirá el envío del registro mientras no se hayan diligenciado el nombre y el número de documento.",
+   "El sistema impedirá registrar dos veces la asistencia del mismo documento en el mismo evento.",
+   "El sistema únicamente aceptará registros dentro del horario del evento."]],
+  ["RF-22","EVIDENCIAS DE EJECUCIÓN","El sistema deberá permitir subir evidencias de la ejecución del evento (fotografías, listas, documentos y videos) asociadas al evento o a una actividad del minuto a minuto.","A",0,[
+   "El sistema únicamente aceptará archivos de imagen, PDF o video dentro del tamaño máximo definido.",
+   "El sistema registrará quién subió cada evidencia y en qué fecha."]],
+  ["RF-23","MONTAJE Y DESMONTAJE","El sistema deberá permitir llevar una lista de chequeo del montaje y desmontaje del evento, marcando cada elemento como instalado o retirado.","M",0,[
+   "El sistema restringirá el cierre del evento mientras haya elementos del desmontaje sin marcar."]],
+  ["RF-24","CONTROL EN TIEMPO REAL","El sistema deberá permitir marcar durante el evento cada actividad del minuto a minuto como realizada o con novedad, registrando una observación cuando haya novedad.","B",0,[
+   "El sistema no permitirá marcar una actividad con novedad sin escribir la observación."]]]},
  {g:"Evaluación y cierre",r:[
-  ["RF-25","Encuesta de satisfacción por QR generada automáticamente desde un banco de preguntas reutilizable (escala de 1 a 5 y comentarios), sin crear un formulario nuevo cada vez.","A"],
-  ["RF-26","Informe de evaluación automático con los resultados de la encuesta.","A"],
-  ["RF-27","Evaluación administrativa interna del equipo organizador: qué funcionó, qué no y lecciones para la próxima edición.","A"],
-  ["RF-28","Certificados o constancias: cargar un Excel con nombres, documentos, fecha y duración, aplicar una plantilla de diseño y generarlos automáticamente.","A"],
-  ["RF-29","Envío masivo por correo y descarga del certificado desde la plataforma, buscando por número de documento.","A"],
-  ["RF-30","Memorias del evento descargables (presentaciones, fotos, conclusiones).","M"],
-  ["RF-31","Informe final de ejecución: presupuesto, asistencia, evaluación, evidencias y novedades.","A"]]},
+  ["RF-25","ENCUESTA DE SATISFACCIÓN CON QR","El sistema deberá generar automáticamente, para cada evento, una encuesta de satisfacción accesible por código QR a partir de un banco de preguntas reutilizable, con escala de 1 a 5 y un espacio para comentarios, sin necesidad de crear un formulario nuevo cada vez.","A",0,[
+   "El sistema permitirá responder la encuesta una sola vez por asistente.",
+   "El sistema únicamente habilitará la encuesta desde el cierre del evento hasta el plazo definido por el organizador."]],
+  ["RF-26","INFORME DE EVALUACIÓN","El sistema deberá generar automáticamente el informe de evaluación del evento con los resultados de la encuesta (promedio por pregunta, número de respuestas y comentarios), descargable en PDF.","A",0,[
+   "El sistema únicamente generará el informe cuando la encuesta esté cerrada."]],
+  ["RF-27","EVALUACIÓN ADMINISTRATIVA","El sistema deberá permitir al equipo organizador registrar la evaluación administrativa del evento: qué funcionó, qué no funcionó y las lecciones aprendidas para la siguiente edición.","A",0,[
+   "El sistema únicamente permitirá diligenciarla a los integrantes de los comités del evento."]],
+  ["RF-28","GENERACIÓN DE CERTIFICADOS","El sistema deberá generar automáticamente certificados o constancias de asistencia a partir de un archivo de Excel con los nombres, números de documento, fecha y duración del evento, aplicando una plantilla de diseño institucional.","A",0,[
+   "El sistema validará que el archivo de Excel tenga las columnas requeridas antes de generar los certificados e informará las filas con errores.",
+   "El sistema únicamente generará certificados para quienes tengan asistencia registrada, salvo que el organizador indique lo contrario."]],
+  ["RF-29","ENVÍO Y DESCARGA DE CERTIFICADOS","El sistema deberá enviar los certificados por correo electrónico masivo a los asistentes y permitir que cada asistente descargue su certificado desde la plataforma ingresando su número de documento.","A",0,[
+   "El sistema únicamente mostrará a cada persona el certificado que corresponde a su número de documento.",
+   "El sistema registrará los correos que no se pudieron entregar."]],
+  ["RF-30","MEMORIAS DEL EVENTO","El sistema deberá permitir publicar las memorias del evento (presentaciones, fotografías y conclusiones) para que los asistentes las descarguen.","M",0,[
+   "El sistema únicamente publicará las memorias aprobadas por el coordinador del evento."]],
+  ["RF-31","INFORME FINAL DE EJECUCIÓN","El sistema deberá generar el informe final de ejecución del evento con el presupuesto ejecutado, la asistencia, los resultados de la evaluación, las evidencias y las novedades, descargable en PDF.","A",0,[
+   "El sistema restringirá el archivo del evento mientras no se haya generado el informe final."]]]},
  {g:"Banco de datos histórico",r:[
-  ["RF-32","Directorio de contactos reutilizable: asistentes, invitados (p. ej., campesinos), evaluadores, conferencistas, proveedores y aliados.","A"],
-  ["RF-33","Volver a invitar a los contactos de una edición anterior: de los 22 evaluadores, buscar solo a los que no puedan repetir.","A"],
-  ["RF-34","Ferias de proyectos: inscripción de proyectos y asignación de evaluadores según los inscritos (p. ej., 75 proyectos, de 7 a 10 por evaluador, en unas 2 horas).","M",1],
-  ["RF-35","Búsqueda y filtros del histórico por tipo de evento, año, lugar y responsable.","M"]]}
+  ["RF-32","DIRECTORIO DE CONTACTOS","El sistema deberá contar con un directorio de contactos reutilizable con asistentes, invitados (por ejemplo, los campesinos del Día del Campesino), evaluadores, conferencistas, proveedores y aliados (colegios y universidades), indicando en qué eventos ha participado cada uno.","A",0,[
+   "El sistema impedirá registrar dos contactos con el mismo número de documento.",
+   "El sistema solicitará la autorización de tratamiento de datos personales antes de guardar un contacto."]],
+  ["RF-33","INVITACIÓN A CONTACTOS ANTERIORES","El sistema deberá permitir seleccionar contactos de una edición anterior de un evento y enviarles la invitación a la nueva edición (por ejemplo, volver a invitar a los 22 evaluadores de la feria), registrando quién acepta y quién no.","A",0,[
+   "El sistema no enviará invitaciones a los contactos que hayan pedido no ser contactados."]],
+  ["RF-34","FERIAS DE PROYECTOS","El sistema deberá permitir la inscripción de proyectos en ferias y la asignación de evaluadores según el número de proyectos inscritos (por ejemplo, 75 proyectos, de 7 a 10 por evaluador, en unas 2 horas).","M",1,[
+   "El sistema impedirá asignar a un evaluador más proyectos que el máximo definido.",
+   "El sistema impedirá que un evaluador califique un proyecto en el que participa."]],
+  ["RF-35","BÚSQUEDA EN EL HISTÓRICO","El sistema deberá permitir buscar y filtrar el histórico de eventos por tipología, año, lugar y responsable.","M",0,[
+   "El sistema únicamente mostrará los resultados a los que el usuario tenga permiso de acceso."]]]}
 ];
 const ROLES=[
  ["Administrador o coordinador general","Crea eventos, comités y catálogos, y ve todos los informes."],
@@ -413,15 +501,27 @@ const ROLES=[
  ["Evaluador de ferias","Ve los proyectos que le tocan y los califica (por confirmar)."],
  ["Directivo (subdirección o coordinación)","Consulta informes en modo solo lectura."]
 ];
+// Requisito no funcional: [ID, NOMBRE, DESCRIPCIÓN, prioridad, por confirmar, [controles y restricciones]]
 const RNF=[
- ["RNF-01","Plataforma web adaptable al celular: el registro por QR y las encuestas se usan desde el teléfono."],
- ["RNF-02","Fácil de usar para personas sin perfil técnico (instructores y aprendices de cualquier programa)."],
- ["RNF-03","Continuidad: la información no depende de una persona y tiene copias de seguridad."],
- ["RNF-04","Protección de datos personales (Ley 1581 de 2012, Habeas Data), porque se guardan documentos de identidad, teléfonos y correos. Añadido en el análisis; la instructora no lo mencionó."],
- ["RNF-05","Documentos descargables en PDF y Excel: programa, minuto a minuto, informes y certificados."],
- ["RNF-06","Alineación con ISO 9001:2015 (control de documentos y registros, mejora continua) y con la imagen institucional del SENA."],
- ["RNF-07","Control de acceso por roles."],
- ["RNF-08","Documentación suficiente para que otros aprendices continúen el proyecto."]
+ ["RNF-01","DISEÑO ADAPTABLE","El sistema deberá adaptarse a pantallas de celulares, tabletas y computadores, porque el registro de asistencia por QR y las encuestas se usan desde el teléfono.","A",0,[
+  "Todas las funciones deberán poder usarse en pantallas desde 360 px de ancho sin desplazamiento horizontal."]],
+ ["RNF-02","USABILIDAD","El sistema deberá ser fácil de usar para personas sin perfil técnico (instructores y aprendices de cualquier programa), con textos en español claro y ayudas en cada formulario.","A",0,[
+  "Las tareas principales (crear un evento, registrar asistencia, generar certificados) deberán poder completarse en pocos pasos y sin capacitación previa."]],
+ ["RNF-03","CONTINUIDAD Y RESPALDO","El sistema deberá conservar la información de los eventos aunque cambien las personas que los organizan, con copias de seguridad periódicas.","A",0,[
+  "Se realizará una copia de seguridad automática al menos una vez por semana.",
+  "Ningún usuario podrá borrar definitivamente un evento archivado."]],
+ ["RNF-04","PROTECCIÓN DE DATOS PERSONALES","El sistema deberá cumplir la Ley 1581 de 2012 (Habeas Data), porque guarda documentos de identidad, teléfonos y correos. Requisito añadido en el análisis; la instructora no lo mencionó.","A",0,[
+  "El sistema solicitará la aceptación de la política de tratamiento de datos antes de registrar datos personales.",
+  "Los números de documento solo serán visibles para los usuarios con rol de organizador o administrador."]],
+ ["RNF-05","DOCUMENTOS DESCARGABLES","El sistema deberá permitir descargar en PDF y Excel el programa, el minuto a minuto, los informes y los certificados.","M",0,[
+  "Los documentos generados incluirán el logo del SENA y la fecha de generación."]],
+ ["RNF-06","CALIDAD E IMAGEN INSTITUCIONAL","El sistema deberá alinearse con la norma ISO 9001:2015 (control de documentos y registros, mejora continua) y con el manual de imagen institucional del SENA.","M",0,[
+  "Todo documento generado tendrá código, versión y fecha."]],
+ ["RNF-07","SEGURIDAD Y CONTROL DE ACCESO","El sistema deberá controlar el acceso por roles (administrador, líder de comité, integrante, presentador, asistente y directivo), mostrando a cada usuario solo las funciones que le corresponden.","A",0,[
+  "Las contraseñas se guardarán cifradas.",
+  "La sesión se cerrará automáticamente tras un tiempo de inactividad."]],
+ ["RNF-08","DOCUMENTACIÓN Y MANTENIBILIDAD","El sistema deberá contar con documentación técnica y manual de usuario suficientes para que otros aprendices puedan continuar el proyecto.","M",0,[
+  "El código fuente estará en un repositorio con instrucciones de instalación."]]
 ];
 // [número, texto, pista opcional, bloqueante]
 const QS=[
@@ -475,7 +575,7 @@ const QS=[
   [32,"¿Qué criterios usará la instructora para dar el proyecto por aceptado?","",0]]}
 ];
 const SECTIONS=["General","Problema","Fases del evento","Requisitos funcionales","Roles","No funcionales","Preguntas","Siguientes pasos"];
-const PRI={A:"Imprescindible",M:"Importante",B:"Deseable"};
+const PRI={A:"Alta",M:"Media",B:"Baja"};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const $=id=>document.getElementById(id);
 const el=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e};
@@ -516,7 +616,7 @@ QS.forEach(g=>{const box=el("div","qgroup");box.append(el("h3","",g.g));const ol
 function press(sel,btn){document.querySelectorAll(sel).forEach(b=>b.setAttribute("aria-pressed",b===btn?"true":"false"))}
 let pFilter="all";
 function applyPFilter(){
-  document.querySelectorAll("#rf .group").forEach(g=>{let any=false;g.querySelectorAll("tbody tr:not(.edit-row)").forEach(tr=>{const show=pFilter==="all"||tr.dataset.p===pFilter;tr.hidden=!show;if(show)any=true});
+  document.querySelectorAll("#rf .group").forEach(g=>{let any=false;g.querySelectorAll("tbody.req").forEach(tb=>{const show=pFilter==="all"||tb.dataset.p===pFilter;tb.hidden=!show;if(show)any=true});
     g.hidden=!any&&!(ST.edit&&ST.edit.mode==="add"&&ST.edit.grupo===g.dataset.g)});
 }
 document.querySelectorAll("[data-f]").forEach(b=>b.addEventListener("click",()=>{pFilter=b.dataset.f;press("[data-f]",b);applyPFilter()}));
@@ -607,27 +707,36 @@ function syncTeamQuestions(ps){
 /* ---------- Requisitos editables ----------
    Registro de cambios de solo agregar: cada edición es una entrada nueva en "requisitos"
    (accion: agregar | editar | eliminar | recuperar | original). El estado actual sale de
-   aplicar todas las entradas en orden sobre los requisitos originales, así nada se pierde. */
+   aplicar todas las entradas en orden sobre los requisitos originales, así nada se pierde.
+   Campos de una entrada: titulo (NOMBRE), texto (DESCRIPCIÓN), controles (uno por línea),
+   prioridad (A/M/B = Alta/Media/Baja), dudoso (1 = por confirmar). */
 const RNF_GROUP="No funcionales";
 const GROUPS=[...RF.map(g=>g.g),RNF_GROUP];
 const ACC={agregar:"Agregó el requisito",editar:"Editó",eliminar:"Eliminó el requisito",recuperar:"Recuperó el requisito",original:"Volvió al texto original"};
+const splitCtl=s=>String(s||"").split("\n").map(x=>x.replace(/^\s*[-•*]\s*/,"").trim()).filter(Boolean);
 function reqState(){
   const map={}, order=[];
-  const put=(it)=>{map[it.key]=it;order.push(it.key)};
-  RF.forEach(g=>g.r.forEach(r=>put({key:r[0],rid:r[0],grupo:g.g,texto:r[1],prioridad:r[2],dudoso:!!r[3],baseTexto:r[1],basePri:r[2],baseDud:!!r[3],origen:"base",estado:"original",hist:[]})));
-  RNF.forEach(r=>put({key:r[0],rid:r[0],grupo:RNF_GROUP,texto:r[1],prioridad:null,dudoso:false,baseTexto:r[1],basePri:null,baseDud:false,origen:"base",estado:"original",hist:[]}));
+  const put=it=>{map[it.key]=it;order.push(it.key)};
+  const baseItem=(r,grupo)=>({key:r[0],rid:r[0],grupo,nombre:r[1],texto:r[2],prioridad:r[3],dudoso:!!r[4],controles:r[5].slice(),
+    base:{nombre:r[1],texto:r[2],prioridad:r[3],dudoso:!!r[4],controles:r[5].slice()},origen:"base",estado:"original",hist:[]});
+  RF.forEach(g=>g.r.forEach(r=>put(baseItem(r,g.g))));
+  RNF.forEach(r=>put(baseItem(r,RNF_GROUP)));
   const used=new Set(order);
   ST.req.forEach(e=>{
     if(e.accion==="agregar"){
       if(!GROUPS.includes(e.grupo))return;
       let rid=e.rid||"RF-?"; if(used.has(rid)){let s=98;while(used.has(rid+String.fromCharCode(s)))s++;rid=rid+String.fromCharCode(s)} used.add(rid);
-      put({key:"n:"+e.id,rid,grupo:e.grupo,texto:e.texto,prioridad:e.grupo===RNF_GROUP?null:(e.prioridad||"M"),dudoso:!!e.dudoso,origen:"nuevo",estado:"nuevo",hist:[e],creador:e});return;
+      put({key:"n:"+e.id,rid,grupo:e.grupo,nombre:e.titulo||"",texto:e.texto,prioridad:e.prioridad||"M",dudoso:!!e.dudoso,controles:splitCtl(e.controles),origen:"nuevo",estado:"nuevo",hist:[e],creador:e});
+      return;
     }
     const it=map[e.req]; if(!it)return; it.hist.push(e); it.ultimo=e;
-    if(e.accion==="editar"){it.texto=e.texto;if(it.grupo!==RNF_GROUP&&e.prioridad)it.prioridad=e.prioridad;it.dudoso=!!e.dudoso;if(it.origen==="base")it.estado="editado"}
+    if(e.accion==="editar"){
+      it.texto=e.texto; if(e.titulo!=null)it.nombre=e.titulo; if(e.controles!=null)it.controles=splitCtl(e.controles);
+      if(e.prioridad)it.prioridad=e.prioridad; it.dudoso=!!e.dudoso; if(it.origen==="base")it.estado="editado";
+    }
     else if(e.accion==="eliminar")it.eliminado=true;
     else if(e.accion==="recuperar")it.eliminado=false;
-    else if(e.accion==="original"&&it.origen==="base"){it.texto=it.baseTexto;it.prioridad=it.basePri;it.dudoso=it.baseDud;it.estado="original";it.eliminado=false}
+    else if(e.accion==="original"&&it.origen==="base"){Object.assign(it,{nombre:it.base.nombre,texto:it.base.texto,prioridad:it.base.prioridad,dudoso:it.base.dudoso,controles:it.base.controles.slice(),estado:"original",eliminado:false})}
   });
   const all=order.map(k=>map[k]); const byGroup={}; all.forEach(it=>(byGroup[it.grupo]=byGroup[it.grupo]||[]).push(it));
   return{map,all,byGroup};
@@ -641,9 +750,11 @@ function personName(e,ps){const p=e&&e.autor&&ps[e.autor];return (p&&p.name)||(e
 
 const editor=el("form","box req-editor writeui");
 editor.innerHTML=`<p class="re-title"></p>
-<div class="field"><label for="re-txt">Texto del requisito</label><textarea id="re-txt" rows="4" maxlength="2000" required></textarea></div>
+<div class="field"><label for="re-nom">Nombre</label><input type="text" id="re-nom" maxlength="150" required placeholder="Ej.: REGISTRO DE ASISTENCIA CON QR"></div>
+<div class="field"><label for="re-txt">Descripción</label><textarea id="re-txt" rows="5" maxlength="2000" required placeholder="El sistema deberá…"></textarea></div>
+<div class="field"><label for="re-ctl">Controles y restricciones <span class="muted">(uno por línea)</span></label><textarea id="re-ctl" rows="4" maxlength="4000" placeholder="El sistema restringirá…&#10;El sistema únicamente permitirá…"></textarea></div>
 <div class="fields">
-  <div class="field re-pri-f"><label for="re-pri">Prioridad</label><select id="re-pri"><option value="A">Imprescindible</option><option value="M">Importante</option><option value="B">Deseable</option></select></div>
+  <div class="field"><label for="re-pri">Prioridad</label><select id="re-pri"><option value="A">Alta</option><option value="M">Media</option><option value="B">Baja</option></select></div>
   <div class="field"><label for="re-dud">Estado</label><select id="re-dud"><option value="0">Confirmado</option><option value="1">Por confirmar con la instructora</option></select></div>
 </div>
 <div class="row"><button type="submit" class="btn re-save">Guardar cambios</button><button type="button" class="btn ghost re-cancel">Cancelar</button><button type="button" class="link re-orig">Volver al texto original</button><button type="button" class="link danger re-del">Eliminar requisito</button><span class="msg" role="status"></span></div>`;
@@ -651,30 +762,34 @@ const eq=s=>editor.querySelector(s);
 function openEdit(key){
   const it=ST.reqMap[key]; if(!it)return;
   ST.edit={mode:"edit",key};
-  eq(".re-title").textContent="Editar "+it.rid; eq("#re-txt").value=it.texto; eq("#re-pri").value=it.prioridad||"A"; eq("#re-dud").value=it.dudoso?"1":"0";
-  eq(".re-pri-f").hidden=it.grupo===RNF_GROUP; eq(".re-orig").hidden=!(it.origen==="base"&&it.estado==="editado");
+  eq(".re-title").textContent="Editar "+it.rid;
+  eq("#re-nom").value=it.nombre; eq("#re-txt").value=it.texto; eq("#re-ctl").value=it.controles.join("\n");
+  eq("#re-pri").value=it.prioridad||"M"; eq("#re-dud").value=it.dudoso?"1":"0";
+  eq(".re-orig").hidden=!(it.origen==="base"&&it.estado==="editado");
   eq(".re-del").hidden=false; eq(".re-del").dataset.c=""; eq(".re-del").textContent="Eliminar requisito";
   eq(".re-save").textContent="Guardar cambios"; eq(".msg").textContent="";
-  render().then(()=>eq("#re-txt").focus());
+  render().then(()=>eq("#re-nom").focus());
 }
 function openAdd(grupo){
   ST.edit={mode:"add",grupo};
-  eq(".re-title").textContent=`Nuevo requisito en ${grupo} (${nextId(grupo)})`; eq("#re-txt").value=""; eq("#re-pri").value="M"; eq("#re-dud").value="0";
-  eq(".re-pri-f").hidden=grupo===RNF_GROUP; eq(".re-orig").hidden=true; eq(".re-del").hidden=true;
+  eq(".re-title").textContent=`Nuevo requisito en ${grupo==="No funcionales"?"requisitos no funcionales":grupo} (${nextId(grupo)})`;
+  eq("#re-nom").value=""; eq("#re-txt").value=""; eq("#re-ctl").value=""; eq("#re-pri").value="M"; eq("#re-dud").value="0";
+  eq(".re-orig").hidden=true; eq(".re-del").hidden=true;
   eq(".re-save").textContent="Agregar requisito"; eq(".msg").textContent="";
-  render().then(()=>eq("#re-txt").focus());
+  render().then(()=>eq("#re-nom").focus());
 }
 function closeEditor(){ST.edit=null;editor.remove();render()}
 const reqAdd=entry=>ST.db.collection("requisitos").add(withName(Object.assign(entry,{autor:ST.me,creado:new Date().toISOString()})));
 editor.addEventListener("submit",ev=>{
-  ev.preventDefault(); if(!ST.edit)return; const txt=eq("#re-txt").value.trim(); if(!txt)return;
-  const grupo=ST.edit.mode==="add"?ST.edit.grupo:(ST.reqMap[ST.edit.key]||{}).grupo;
-  const pri=grupo===RNF_GROUP?null:eq("#re-pri").value, dud=eq("#re-dud").value==="1"?1:0;
+  ev.preventDefault(); if(!ST.edit)return;
+  const nom=eq("#re-nom").value.trim(), txt=eq("#re-txt").value.trim(); if(!nom||!txt)return;
+  const ctl=splitCtl(eq("#re-ctl").value), pri=eq("#re-pri").value, dud=eq("#re-dud").value==="1"?1:0;
+  const fields={titulo:nom,texto:txt,controles:ctl.join("\n"),prioridad:pri,dudoso:dud};
   let entry;
-  if(ST.edit.mode==="add")entry={accion:"agregar",grupo,rid:nextId(grupo),texto:txt,prioridad:pri,dudoso:dud};
+  if(ST.edit.mode==="add"){const grupo=ST.edit.grupo;entry=Object.assign({accion:"agregar",grupo,rid:nextId(grupo)},fields)}
   else{const it=ST.reqMap[ST.edit.key];if(!it)return closeEditor();
-    if(it.texto===txt&&(it.prioridad||null)===pri&&(it.dudoso?1:0)===dud)return closeEditor();
-    entry={accion:"editar",req:it.key,texto:txt,prioridad:pri,dudoso:dud}}
+    if(it.nombre===nom&&it.texto===txt&&it.controles.join("\n")===fields.controles&&it.prioridad===pri&&(it.dudoso?1:0)===dud)return closeEditor();
+    entry=Object.assign({accion:"editar",req:it.key},fields)}
   write(editor,()=>reqAdd(entry),closeEditor,"");
 });
 eq(".re-cancel").addEventListener("click",closeEditor);
@@ -688,54 +803,77 @@ async function act(entry,btn){btn.disabled=true;try{await reqAdd(entry)}catch(e)
 let reqSig="";
 function renderReqs(ps){
   const S=reqState(); ST.reqMap=S.map; ST.reqAll=S.all;
-  const sig=JSON.stringify([ST.req.map(e=>e.id),ST.edit,ST.mode,Object.keys(ps).length,ST.req.map(e=>personName(e,ps))]);
+  const sig=JSON.stringify([ST.req.map(e=>e.id),ST.edit,ST.mode,ST.req.map(e=>personName(e,ps)),ST.confirmDel||""]);
   if(sig===reqSig)return; reqSig=sig;
   const active=S.all.filter(x=>!x.eliminado);
   $("rf-count").textContent=`${active.filter(x=>x.grupo!==RNF_GROUP).length} requisitos`;
   $("rnf-count").textContent=`${active.filter(x=>x.grupo===RNF_GROUP).length} requisitos`;
   // Conservar el foco y la posición del cursor del editor al reconstruir las tablas
   const fa=document.activeElement, inEd=fa&&editor.contains(fa), sel=inEd&&"selectionStart" in fa?[fa.selectionStart,fa.selectionEnd]:null;
-  const rf=$("rf"); rf.textContent=""; RF.forEach(g=>rf.append(groupBlock(g.g,S.byGroup[g.g]||[],true,ps,false)));
-  const rn=$("rnf"); rn.textContent=""; rn.append(groupBlock(RNF_GROUP,S.byGroup[RNF_GROUP]||[],false,ps,true));
+  const rf=$("rf"); rf.textContent=""; RF.forEach(g=>rf.append(groupBlock(g.g,S.byGroup[g.g]||[],ps,false)));
+  const rn=$("rnf"); rn.textContent=""; rn.append(groupBlock(RNF_GROUP,S.byGroup[RNF_GROUP]||[],ps,true));
   if(inEd&&editor.isConnected){fa.focus();if(sel)try{fa.setSelectionRange(sel[0],sel[1])}catch(e){}}
   applyPFilter();
 }
-function groupBlock(g,items,withPri,ps,noTitle){
-  const box=el("div","group"); box.dataset.g=g; if(!noTitle)box.append(el("h3","",g));
-  const wrap=el("div","tbl"), t=el("table"); t.innerHTML=`<thead><tr><th>ID</th><th>Requisito</th>${withPri?"<th>Prioridad</th>":""}</tr></thead>`;
-  const tb=el("tbody"); t.append(tb); wrap.append(t); box.append(wrap);
+function reqActions(it){
+  const box=el("span","ract");
+  if(ST.mode!=="ok"||(ST.edit&&ST.edit.mode==="edit"&&ST.edit.key===it.key))return box;
+  const mk=(t,cls,fn)=>{const b=el("button","link"+(cls?" "+cls:""),t);b.type="button";b.addEventListener("click",fn);box.append(b);return b};
+  if(it.eliminado){const b=mk("Recuperar","",()=>act({accion:"recuperar",req:it.key,texto:"Recuperado"},b));return box}
+  if(ST.confirmDel===it.key){
+    box.append(el("span","",`¿Eliminar ${it.rid}? `));
+    const y=mk("Sí, eliminar","danger",()=>{ST.confirmDel=null;act({accion:"eliminar",req:it.key,texto:"Eliminado"},y)});
+    mk("No","",()=>{ST.confirmDel=null;render()});
+    return box;
+  }
+  mk("Editar","",()=>openEdit(it.key));
+  mk("Eliminar","danger",()=>{ST.confirmDel=it.key;render()});
+  return box;
+}
+function groupBlock(g,items,ps,isRnf){
+  const box=el("div","group"); box.dataset.g=g; if(!isRnf)box.append(el("h3","",g));
+  const wrap=el("div","tbl"), t=el("table","reqtbl");
+  t.innerHTML=`<colgroup><col class="c-id"><col class="c-nom"><col class="c-desc"><col class="c-pri"></colgroup><thead><tr><th>ID</th><th>Nombre</th><th>Descripción</th><th>Prioridad</th></tr></thead>`;
+  wrap.append(t); box.append(wrap);
+  if(!items.length){const tb=el("tbody");tb.innerHTML=`<tr><td colspan="4" class="empty">No hay requisitos en este grupo.</td></tr>`;t.append(tb)}
   items.forEach(it=>{
-    const tr=el("tr",it.eliminado?"deleted":""); tr.dataset.p=it.prioridad||""; tr.dataset.key=it.key;
-    tr.append(el("td","id",it.rid));
-    const td=el("td","rtxt"); td.append(el("span","rbody",it.texto));
-    if(it.dudoso&&!it.eliminado)td.append(" ",el("span","doubt","· por confirmar"));
+    const tb=el("tbody","req"+(it.eliminado?" deleted":"")); tb.dataset.p=it.prioridad||""; tb.dataset.key=it.key;
+    // Fila principal: ID · NOMBRE · DESCRIPCIÓN · PRIORIDAD
+    const tr=el("tr","r-main");
+    const tdId=el("td","id",it.rid); tdId.rowSpan=2;
+    const tdNom=el("td","r-nom",it.nombre||"(sin nombre)");
+    const tdDesc=el("td","r-desc"); tdDesc.append(el("span","rbody",it.texto));
+    if(it.dudoso&&!it.eliminado)tdDesc.append(" ",el("span","doubt","· por confirmar"));
     const meta=el("div","rmeta");
     if(it.eliminado)meta.append(el("span","chip del-chip","Eliminado"),el("span","muted",`${personName(it.ultimo,ps)} · ${fmt(it.ultimo&&it.ultimo.creado)}`));
     else if(it.origen==="nuevo")meta.append(el("span","chip team","Nuevo"),el("span","muted",`${personName(it.creador,ps)} · ${fmt(it.creador.creado)}`));
     else if(it.estado==="editado")meta.append(el("span","chip edit-chip","Editado"),el("span","muted",`${personName(it.ultimo,ps)} · ${fmt(it.ultimo.creado)}`));
-    if(ST.mode==="ok"&&!(ST.edit&&ST.edit.mode==="edit"&&ST.edit.key===it.key)){
-      const b=el("button","link",it.eliminado?"Recuperar":"Editar"); b.type="button";
-      b.addEventListener("click",()=>it.eliminado?act({accion:"recuperar",req:it.key,texto:"Recuperado"},b):openEdit(it.key));
-      meta.append(b);
-    }
-    if(meta.childNodes.length)td.append(meta);
+    meta.append(reqActions(it));
+    if(meta.childNodes.length&&meta.textContent)tdDesc.append(meta);
     const nChanges=it.hist.length-(it.origen==="nuevo"?1:0);
     if(nChanges>0){
       const d=el("details","rhist"); d.append(el("summary","",`Historial (${it.hist.length})`)); const ul=el("ul","entries");
       it.hist.slice().reverse().forEach(e=>{const li=el("li","entry"),w=el("div","who");w.append(el("b","",personName(e,ps)),el("span","",fmt(e.creado)),el("span","",ACC[e.accion]||e.accion));li.append(w);
-        if(e.accion==="editar"||e.accion==="agregar")li.append(el("p","body",e.texto+(e.prioridad&&it.grupo!==RNF_GROUP?` (${PRI[e.prioridad]})`:"")));ul.append(li)});
-      if(it.origen==="base"){const li=el("li","entry");li.append(el("div","who","Texto original"),el("p","body",it.baseTexto));ul.append(li)}
+        if(e.accion==="editar"||e.accion==="agregar"){li.append(el("p","body",`${e.titulo||""}${e.prioridad?` (${PRI[e.prioridad]})`:""}\n${e.texto}${e.controles?"\nControles:\n- "+splitCtl(e.controles).join("\n- "):""}`))}ul.append(li)});
+      if(it.origen==="base"){const li=el("li","entry");li.append(el("div","who","Texto original"),el("p","body",`${it.base.nombre} (${PRI[it.base.prioridad]})\n${it.base.texto}\nControles:\n- ${it.base.controles.join("\n- ")}`));ul.append(li)}
       d.append(ul); d.open=ST.openHist.has(it.key);
       d.addEventListener("toggle",()=>{d.open?ST.openHist.add(it.key):ST.openHist.delete(it.key)});
-      td.append(d);
+      tdDesc.append(d);
     }
-    tr.append(td);
-    if(withPri){const c=el("td","pri");if(it.prioridad)c.append(el("span","chip "+it.prioridad,PRI[it.prioridad]));tr.append(c)}
-    tb.append(tr);
-    if(ST.edit&&ST.edit.mode==="edit"&&ST.edit.key===it.key){const er=el("tr","edit-row"),c=el("td");c.colSpan=withPri?3:2;c.append(editor);er.append(c);tb.append(er)}
+    const tdPri=el("td","pri"); tdPri.rowSpan=2; if(it.prioridad)tdPri.append(el("span","chip "+it.prioridad,PRI[it.prioridad]));
+    tr.append(tdId,tdNom,tdDesc,tdPri); tb.append(tr);
+    // Fila de CONTROLES Y RESTRICCIONES
+    const tr2=el("tr","r-ctl");
+    tr2.append(el("td","r-ctl-label","CONTROLES Y RESTRICCIONES"));
+    const tdC=el("td","r-ctl-list");
+    if(it.controles.length){const ul=el("ul","ctl");it.controles.forEach(c=>ul.append(el("li","",c)));tdC.append(ul)}
+    else tdC.append(el("span","empty","Sin controles definidos."));
+    tr2.append(tdC); tb.append(tr2);
+    if(ST.edit&&ST.edit.mode==="edit"&&ST.edit.key===it.key){const er=el("tr","edit-row"),c=el("td");c.colSpan=4;c.append(editor);er.append(c);tb.append(er)}
+    t.append(tb);
   });
   if(ST.edit&&ST.edit.mode==="add"&&ST.edit.grupo===g)box.append(editor);
-  else if(ST.mode==="ok"){const b=el("button","btn ghost add-req",noTitle?"+ Agregar requisito no funcional":`+ Agregar requisito en ${g}`);b.type="button";b.addEventListener("click",()=>openAdd(g));box.append(b)}
+  else if(ST.mode==="ok"){const b=el("button","btn ghost add-req",isRnf?"+ Agregar requisito no funcional":`+ Agregar requisito en ${g}`);b.type="button";b.addEventListener("click",()=>openAdd(g));box.append(b)}
   return box;
 }
 
@@ -792,11 +930,12 @@ function exportText(){
   const RS=reqState();
   L.push("## Requisitos (estado actual)","");
   GROUPS.forEach(g=>{const it=(RS.byGroup[g]||[]).filter(x=>!x.eliminado);if(!it.length)return;L.push(`### ${g==="No funcionales"?"Requisitos no funcionales":g}`);
-    it.forEach(x=>L.push(`- **${x.rid}** ${x.texto}${x.prioridad?` _(${PRI[x.prioridad]})_`:""}${x.dudoso?" · por confirmar":""}${x.origen==="nuevo"?" · nuevo":x.estado==="editado"?" · editado":""}`));L.push("")});
-  const delR=RS.all.filter(x=>x.eliminado); if(delR.length){L.push("### Eliminados");delR.forEach(x=>L.push(`- ~~${x.rid} ${x.texto}~~`));L.push("")}
+    it.forEach(x=>{L.push(`#### ${x.rid} · ${x.nombre} · Prioridad ${PRI[x.prioridad]||"-"}${x.dudoso?" · por confirmar":""}${x.origen==="nuevo"?" · nuevo":x.estado==="editado"?" · editado":""}`,"",x.texto,"","**Controles y restricciones:**");
+      if(x.controles.length)x.controles.forEach(c=>L.push(`- ${c}`));else L.push("- (sin controles)");L.push("")})});
+  const delR=RS.all.filter(x=>x.eliminado); if(delR.length){L.push("### Eliminados");delR.forEach(x=>L.push(`- ~~${x.rid} ${x.nombre}~~`));L.push("")}
   L.push("## Historial de cambios en los requisitos","");
   if(!ST.req.length)L.push("(sin cambios)");
-  ST.req.forEach(e=>{const it=RS.map[e.accion==="agregar"?"n:"+e.id:e.req];L.push(`- ${fmt(e.creado)} · ${who(e)} · ${ACC[e.accion]||e.accion} ${it?it.rid:""}${e.accion==="editar"||e.accion==="agregar"?": "+e.texto:""}`)});
+  ST.req.forEach(e=>{const it=RS.map[e.accion==="agregar"?"n:"+e.id:e.req];L.push(`- ${fmt(e.creado)} · ${who(e)} · ${ACC[e.accion]||e.accion} ${it?it.rid:""}${e.accion==="editar"||e.accion==="agregar"?": "+(e.titulo?e.titulo+" — ":"")+e.texto:""}`)});
   L.push("");
   L.push("## Respuestas a las preguntas","");
   QS.forEach(g=>g.q.forEach(q=>{const a=ST.byQ["q"+q[0]]||[];if(!a.length)return;L.push(`### ${q[0]}. ${q[1]}`);a.forEach(x=>L.push(`- ${who(x)} (${fmt(x.creado)}): ${x.texto}`));L.push("")}));
@@ -814,7 +953,7 @@ function supaDB(cfg){
   const H={apikey:cfg.key,"Content-Type":"application/json"};
   if(/^eyJ/.test(cfg.key))H.Authorization="Bearer "+cfg.key;
   const TIPO={respuestas:"respuesta",preguntas:"pregunta",comentarios:"comentario",requisitos:"requisito"};
-  const COLS="id,tipo,qid,texto,tema,seccion,ref,bloqueante,nombre,creado,req,accion,rid,grupo,prioridad,dudoso";
+  const COLS="id,tipo,qid,texto,tema,seccion,ref,bloqueante,nombre,creado,req,accion,rid,grupo,prioridad,dudoso,titulo,controles";
   let mine; try{mine=new Set(JSON.parse(localStorage.getItem("req-mias")||"[]"))}catch(e){mine=new Set()}
   const saveMine=()=>{try{localStorage.setItem("req-mias",JSON.stringify([...mine]))}catch(e){}};
   let clave=null; try{clave=localStorage.getItem("req-clave")}catch(e){}
@@ -837,7 +976,7 @@ function supaDB(cfg){
     collection(c){const q={orderBy(){return q},
       onSnapshot(next){(subs[c]=subs[c]||[]).push(next);start();return()=>{}},
       async add(v){
-        const body={tipo:TIPO[c],clave};["qid","texto","tema","seccion","ref","bloqueante","nombre","req","accion","rid","grupo","prioridad","dudoso"].forEach(k=>{if(v[k]!==undefined&&v[k]!==null)body[k]=v[k]});
+        const body={tipo:TIPO[c],clave};["qid","texto","tema","seccion","ref","bloqueante","nombre","req","accion","rid","grupo","prioridad","dudoso","titulo","controles"].forEach(k=>{if(v[k]!==undefined&&v[k]!==null)body[k]=v[k]});
         const r=await fetch(`${base}/entradas?select=id`,{method:"POST",headers:Object.assign({Prefer:"return=representation"},H),body:JSON.stringify(body)});
         if(!r.ok)throw fail(r);
         const out=await r.json(); const id=out&&out[0]&&out[0].id; if(id){mine.add(id);saveMine()}
